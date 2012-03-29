@@ -1,0 +1,52 @@
+#include <stdio.h>
+#include <iostream>
+//include all the iBLOB and Locator headers
+#include "iBlob.h"
+#include "OCILobWrapper.h"
+#include <cstring>
+#include <vector>
+
+//Data types that a Base Object can take. i.e data types supported by the iBloB
+enum BO_DataTypes 
+{
+	Int,
+	DoubleArray,
+	Double,
+	IntArray,
+	Char*
+};
+
+//struct used to hold path information :: builing block of a PATH object
+struct PathComponent
+{
+	char label[15];
+	int AccessCode;
+	Locator loc ;
+} 
+
+//TSS path class ... every path is stored as an instance of this class
+class TSSpath
+{
+
+private:
+	//input path string
+	char path_string[50];
+	//Vector encapsulates pathstring + access code + iBlob locators
+	vector <PathComponent> verbose_path;
+public:
+	//Default constructor
+	TSSPath ();
+	//Constructor that takes an path string as input
+	TSSPath (char * input_path);
+
+	//Return true if Path points to Base Object
+	bool isBO();
+	//Return true if Path points to Structured Object
+	bool isSO();
+	//Return true if Path points to a List
+	bool isList();
+	//if Path points to a BO, will return data type of the BO, else will throw bad read exception
+	BO_DataType getBOType();
+
+
+};
