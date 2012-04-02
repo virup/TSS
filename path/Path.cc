@@ -3,46 +3,42 @@
 Path& Path::operator+(string p)
 {
 	//generate new path string
-	string new_path_string;
-
-	new_path_string = GenNewPathString(p);
-
-/*
-	//if the new_path_string conforms to the grammar  i.e. it is a valid path.
-	if(TSSParserObj.Scan(new_path_string) == true)
-	{
-		//Update Path class.
-		UpdatePaths(new_path_string);
-	}
-*/
-
+	string newStrPath = this->strPath;
+    newStrPath.append(p);
+    Path p(this->newStrPath, this->tp, this->iblob);
+    return p;
 }
 
 
-Path& Path::operator=(const Path & path)
+Path& Path::operator=(const Path &path)
 {
 	/* ********* ADDED BY VIRU ************** */
-	this->verbose_path.clear();
-	for(vector<PathComponent> ::iterator it = path.verbose_path.begin();
-		it != path.verbose_path.end();
+	this->vPath.clear();
+	for(vector<PathComponent> ::iterator it = path.vPath.begin();
+		it != path.vPath.end();
 		it++)
 		this->verbose.push_back(*it);
+    this->strPath = path.strPath;
+    this->tp = path.tp;
+    this->isConsistent = path.isConsistent;
+    this->iblob = path.iblob;
 
 	/* ************************************* */
 	return *this;
 }
 
 
-void Path::UpdatePaths(string new_p)
+void Path::UpdatePaths(string nStrPath)
 {
-	int old_size = verbose_path.size();
+    /*
+	int old_size = vPath.size();
 	int i = 0;
 	string tok;
 	char *dup;
-	dup = strdup(new_p.c_str());
+	dup = strdup(nStrPath.c_str());
 
-	//Update the path_string
-	(*this).path_string = new_p;
+	//Update the strPath
+	(*this).strPath = nStrPath;
 
 	//this will remove the old_path component in the new path
 	while(i < old_size)
@@ -53,68 +49,72 @@ void Path::UpdatePaths(string new_p)
 
 	tok = strtok(dup,".");
 
-	//Update the verbose_path 
+	//Update the vPath
 	while(tok.empty() != true)
 	{
 		PathComponent newComponent;
 		newComponent.label = tok;
-		verbose_path.push_back(newComponent);
+		vPath.push_back(newComponent);
 	}
+    */
+
+    // TODO: Check if this works. Also check memory leak
+    Path p(nStrPath, this->tp, this->iblob);
+    this = &p;
 }
 
-string Path::GenNewPathString(string p)
-{
-	string temp;
-
-	vector<PathComponent>::iterator it;
-
-	//build temp string to equal the old path
-        for(it = verbose_path.begin() ; it < verbose_path.end() ; it++)
-        {
-        	temp += (*it).label;
-        	temp += ".";
-        }
-
-	//concat input_path to temp (which holds the old path) 
-        temp += p;
-
-	return temp;
-}
-
-
-/* -- this comment block contains fuctions used to get Path type information
 
 bool Path::isBO()
 {
-	return TSSParserObj.isBO(*this);
+	return tp->isBO(this);
 }
 
 bool Path::isSO()
 {
-	return TSSParserObj.isSO(*this);
+	return tp->isSO(this);
 }
 
 bool Path::isList()
 {
-	return TSSParserObj.isList(*this);
+	return tp->isList(this);
 }
 
 bool Path::isRef()
 {
-	return TSSParserObj.isRef(*this);
+	return tp->isRef(this);
 }
 
-BO_DataType Path::getBoType()
+DataType Path::getBoType()
 {
-	return TSSParserObj.getBOType(*this);
+	return tp->getBOType(this);
 }
-*/
+
+vector<int> Path::getAccessCode()
+{
+    vector<int> accessCodeList;
+    for(vector<PathComponent> ::iterator it = vPath.begin();
+            it!= vPath.end();
+            it++)
+        accessCodeList.push_back(it->accessCode);
+
+    return accessCodeList;
+}
+
+bool Path::isConsistent()
+{
+    return this->isConsistent;
+}
+
+void  Path::makeInconsistent()
+{
+    this->isConsistent = false;
+}
 
 
 //Default Constructor
 Path::Path()
 {
-
+    isConsistent = false;
 }
 
 
@@ -122,29 +122,28 @@ Path::Path()
 Path::Path(string strPath, TSSParser *tp, iBlob *iblob)
 {
 	/* *********** ADDED BY VIRU *********** */
-	this->path_string = strPath;
-	this->TSSParserObj = tp;
+	this->strPath = strPath;
+	this->tp = tp;
 	this->iblob = iblob;
-	// TODO: update the verbose path here 
+    this->isConsistent = false;
+    PopulateLocators();
 	/* ************************************ */
 }
 
-//This is a critical function that populates the access_code and Locator fields of the verbose_path vector.
-//It is this mapping of path components (label strings) to their corresponding iBloB Locators that provides semantic meaning to the path string with respect to the iBloB.
-//Upon completion of this function a Path (i.e. verbose_path vector of thr Path class) will hold iBloB Locators corresponding to the path string.
-Path::PopulateLocators()
+// Update the locators in the vPath object
+int Path::PopulateLocators()
 {
 	/* ************ ADDED BY VIRU ***************** */
 	// Get the global locator
-	Locator gLocator = iblob.locateGlobal();
+	Locator gLocator = iblob->locateGlobal();
 	// The tempLocator will finally contain a locator to the object
 	Locator tempLocator = gLocator;
-	for(vector<PathComponent>::iterator it = verbose_path.begin(); it!= verbose_path.end(); it++)
+	for(vector<PathComponent>::iterator it = vPath.begin(); it!= vPath.end(); it++)
 	{
-		tempLocator = iblob->locate(tempLocator, (*it).accessCode;
+		tempLocator = iblob->locate(tempLocator, (*it).accessCode);
 		(*it).loc = tempLocator;
-	}
+    }
+    isConsistent = true;
 	/* ****************************************** */
-
-	
+    return 1;
 }
