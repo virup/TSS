@@ -16,6 +16,9 @@ Provides a semantic way for access components
 using namespace std;
 
 
+static text *username = (text *) "aist";
+static text *password = (text *) "aist11g";
+
 class TSS
 {
     public:
@@ -30,8 +33,8 @@ class TSS
         setStoreHandle(void* b, bool ismem = false);// associate blob handler
 
         /*// append for SO List iff.  path.isSO == true & path.isList == true
-        Path append(const Path &path); // append a new structured element to the SO list
-        */
+          Path append(const Path &path); // append a new structured element to the SO list
+          */
 
         /* Create Path */
         Path createPath();
@@ -44,7 +47,7 @@ class TSS
 
         // insert bo iff.  path.isSO == true & tssp.isBO(path.path+"."+name) == true
         Path setInt(Path &path, string name, int value); // set the integer value for a base object
-        Path setDouble(Path &path, string name, double value); // set the double value for a base object 
+        Path setDouble(Path &path, string name, double value); // set the double value for a base object
         Path setIntArray(Path &path, string name, int array[], uint length); // set the integer array for a base object
         Path setDoubleArray(Path &path, string name, double array[], uint length); // set the double array for a base object
         Path setString(Path &path, string name, string value); // set the string value for a base object
@@ -79,9 +82,17 @@ class TSS
 
 
     private:
-        TSSParser tssp;
-        iBlob* myiBlob;
+        TSSParser *tp;
+        OCILobWrapper *lobWrapper;
+        mSlob *iblob;
         string type;
+
+        typedef struct OCILobWrapper{
+            OCILobLocator* lob;
+            OCISvcCtx*	cntxt;
+            OCIError* errhp;
+        } OCILobWrapper;
+
 
 
         /* Locate Functions */

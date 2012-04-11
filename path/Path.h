@@ -63,7 +63,14 @@ public:
 	DataType getBOType();
     vector<int> getAccessCode();
     bool isConsistent();
+    bool makeConsistent();
     void makeInconstent();
+    int readInt();
+    double readDouble();
+    string readString();
+    uint readIntArray(int *intBuf, uint bufsize);
+    uint readDoubleArray(double *doubleBuf, uint bufsize);
+    uint readBinary(unsigned char *buf, uint bufsize);
 
     // Add string component to a path object
 	Path & operator+(string p);

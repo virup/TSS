@@ -27,6 +27,11 @@ Path& Path::operator=(const Path &path)
 	return *this;
 }
 
+bool Path::makeConsistent()
+{
+    this->PopulateLocators();
+    return true;
+}
 
 void Path::UpdatePaths(string nStrPath)
 {
@@ -147,3 +152,257 @@ int Path::PopulateLocators()
 	/* ****************************************** */
     return 1;
 }
+
+
+int Path::readInt() //TODO: throws read error
+{
+    if(!this->isConsistent())
+        this->makeConsistent;
+    if(this->BO && this->getBoType == INT)
+    {
+        Locator l = this->vPath[vPath.size()].loc;
+        int intVal;
+        if(iblob->readInt(intVal, l))
+            return intVal;
+        else
+            return -1;
+    }
+    else
+    {
+        //TODO: Throw exception
+        return -1; // this is not logically correct
+    }
+}
+
+double Path::readDouble() //TODO: throws read error
+{
+    if(!this->isConsistent())
+        this->makeConsistent;
+    if(this->BO && this->getBoType == DOUBLE)
+    {
+        Locator l = this->vPath[vPath.size()].loc;
+        double doubleVal;
+        if(readDouble(iblob->doubleVal, l))
+            return doubleVal;
+        else
+            return -1;
+    }
+    else
+    {
+        //TODO: Throw exception
+        return -1; // this is not logically correct
+    }
+}
+
+uint readIntArray(int *intBuf, uint bufsize)
+{
+    if(!this->isConsistent())
+        this->makeConsistent;
+    if(this->BO && this->getBoType == INTARRAY)
+    {
+        Locator l = this->vPath[vPath.size()-1].loc;
+        return iblob->readIntArray(intBuf, l, bufsize); 
+    }
+    else
+    {
+        //TODO: Throw exception
+        return -1; // this is not logically correct
+    }
+}
+
+uint readDoubleArray(double *doubleBuf, uint bufsize)
+{
+    if(!this->isConsistent())
+        this->makeConsistent;
+    if(this->BO && this->getBoType == DOUBLEARRAY)
+    {
+        Locator l = this->vPath[vPath.size()-1].loc;
+        return iblob->readDoubleArray(doubleBuf, l, bufsize);
+    }
+    else
+    {
+        //TODO: Throw exception
+        return -1; // this is not logically correct
+    }
+}
+
+uint readBinary(unsigned char* charBuf, uint bufsize)
+{
+    if(!this->isConsistent())
+        this->makeConsistent;
+    if(this->BO && this->getBoType == BYTE)
+    {
+        Locator l = this->vPath[vPath.size()-1].loc;
+        return iblob->readCharsArray(charsBuf, l, bufsize);
+    }
+    else
+    {
+        //TODO: Throw exception
+        return -1; // this is not logically correct
+    }
+}
+
+uint setint(int intVal)
+{
+    makeInconsistent();
+    Locator l;
+
+    l = iblob->locateGlobal();
+    if(l.getElements()==0)
+    {
+        l.insert(0,OBJECT_LEVEL);
+        l = l.locate(l, 0);
+    }
+
+    vector<PathComponent>::iterator it = vPath.begin();
+    do
+    {
+        try{
+            l = iblob->locate(l,it->accessCode, OBJECT_LEVEL);
+        }
+        catch(...)
+        {
+            l = iblob->insert(l,it->accessCode, OBJECT_LEVEL);
+            it->loc = l;
+        }
+        it++;
+    }while(it!= vPath.end());
+    if(l.getElements() < it->accessCode)
+        throw "Not Present";
+    l = iblob->setInt(intVal, l, it->accessCode);
+    it->loc = l;
+    this->isConsistent =  true;
+    return 1;
+}
+
+uint setDouble(double doubleVal)
+{
+    makeInconsistent();
+    Locator l;
+
+    l = iblob->locateGlobal();
+    if(l.getElements()==0)
+    {
+        l.insert(0,OBJECT_LEVEL);
+        l = l.locate(l, 0);
+    }
+
+    vector<PathComponent>::iterator it = vPath.begin();
+    do
+    {
+        try{
+            l = iblob->locate(l,it->accessCode, OBJECT_LEVEL);
+        }
+        catch(...)
+        {
+            l = iblob->insert(l,it->accessCode, OBJECT_LEVEL);
+            it->loc = l;
+        }
+        it++;
+    }while(it!= vPath.end());
+    if(l.getElements() < it->accessCode)
+        throw "Not Present";
+    l = iblob->setDouble(doubleVal, l, it->accessCode);
+    it->loc = l;
+    this->isConsistent =  true;
+    return 1;
+}
+
+uint setIntArray(int *intBuf, uint size)
+{
+    makeInconsistent();
+    Locator l;
+
+    l = iblob->locateGlobal();
+    if(l.getElements()==0)
+    {
+        l.insert(0,OBJECT_LEVEL);
+        l = l.locate(l, 0);
+    }
+
+    vector<PathComponent>::iterator it = vPath.begin();
+    do
+    {
+        try{
+            l = iblob->locate(l,it->accessCode, OBJECT_LEVEL);
+        }
+        catch(...)
+        {
+            l = iblob->insert(l,it->accessCode, OBJECT_LEVEL);
+            it->loc = l;
+        }
+        it++;
+    }while(it!= vPath.end());
+    if(l.getElements() < it->accessCode)
+        throw "Not Present";
+    l = iblob->insertIntArray(intBuf, size, l,it->accessCode);
+    it->loc = l;
+    this->isConsistent =  true;
+    return 1;
+}
+uint setDoubleArray(double *doubleBuf, uint size)
+{
+    makeInconsistent();
+    Locator l;
+
+    l = iblob->locateGlobal();
+    if(l.getElements()==0)
+    {
+        l.insert(0,OBJECT_LEVEL);
+        l = l.locate(l, 0);
+    }
+
+    vector<PathComponent>::iterator it = vPath.begin();
+    do
+    {
+        try{
+            l = iblob->locate(l,it->accessCode, OBJECT_LEVEL);
+        }
+        catch(...)
+        {
+            l = iblob->insert(l,it->accessCode, OBJECT_LEVEL);
+            it->loc = l;
+        }
+        it++;
+    }while(it!= vPath.end());
+    if(l.getElements() < it->accessCode)
+        throw "Not Present";
+    l = iblob->insertIntDouble(doubleVal, size, l,it->accessCode);
+    it->loc = l;
+    this->isConsistent =  true;
+    return 1;
+}
+
+uint setBinary(unsigned char *charBuf, uint size)
+{
+    makeInconsistent();
+    Locator l;
+
+    l = iblob->locateGlobal();
+    if(l.getElements()==0)
+    {
+        l.insert(0,OBJECT_LEVEL);
+        l = l.locate(l, 0);
+    }
+
+    vector<PathComponent>::iterator it = vPath.begin();
+    do
+    {
+        try{
+            l = iblob->locate(l,it->accessCode, OBJECT_LEVEL);
+        }
+        catch(...)
+        {
+            l = iblob->insert(l,it->accessCode, OBJECT_LEVEL);
+            it->loc = l;
+        }
+        it++;
+    }while(it!= vPath.end());
+    if(l.getElements() < it->accessCode)
+        throw "Not Present";
+    l = iblob->insert(charBuf, size, l, it->accessCode);
+    it->loc = l;
+    this->isConsistent =  true;
+    return 1;
+}
+
