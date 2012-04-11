@@ -10,9 +10,8 @@
 
 
 
-#endif	/* TSSPARSER_H */
 
-#include "Path.h"
+#include "../path/Path.h"
 #include "Scanner.h"
 #include <cstring>
 #include <map>
@@ -20,7 +19,7 @@
 #include <list>
 
 using namespace std;
-
+class Path;
 enum Type {Int, IntAR, Double, DoubleAR, String, Byte};
 class TSSParser
 {
@@ -93,11 +92,12 @@ class TSSParser
          bool validateGrammar();   // Validate the given grammar
         int* genAccessCode(Path p);           // Generate access code
 
-        bool isBO(Path p);
-        bool isSO(Path p);
-        bool isList(Path p);
-        bool isRef(Path p);
+        bool isBO(Path* p);
+        bool isSO(Path* p);
+        bool isList(Path* p);
+        bool isRef(Path* p);
 
-        Type getBOType(Path p);
+        Type getBOType(Path* p);
         bool validatePath(Node *, string Name); // Validate a given path
 };
+#endif	/* TSSPARSER_H */

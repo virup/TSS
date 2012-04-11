@@ -1,4 +1,4 @@
-#include "Path.h"
+#include "../path/Path.h"
 #include "TSSParser.h"
 #include "Scanner.h"
 #include <cstring>

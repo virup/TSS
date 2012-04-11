@@ -1,11 +1,11 @@
 #include "Path.h"
 
-Path& Path::operator+(string p)
+Path& Path::operator+(string strPath)
 {
 	//generate new path string
 	string newStrPath = this->strPath;
-    newStrPath.append(p);
-    Path p(this->newStrPath, this->tp, this->iblob);
+    newStrPath.append(strPath);
+    Path p(newStrPath, this->tp, this->iblob);
     return p;
 }
 
@@ -14,13 +14,13 @@ Path& Path::operator=(const Path &path)
 {
 	/* ********* ADDED BY VIRU ************** */
 	this->vPath.clear();
-	for(vector<PathComponent> ::iterator it = path.vPath.begin();
-		it != path.vPath.end();
-		it++)
-		this->verbose.push_back(*it);
+	for(vector<PathComponent> ::const_iterator it = path.vPath.begin();
+            it != path.vPath.end();
+            it++)
+		this->vPath.push_back(*it);
     this->strPath = path.strPath;
     this->tp = path.tp;
-    this->isConsistent = path.isConsistent;
+    this->consistent = path.consistent;
     this->iblob = path.iblob;
 
 	/* ************************************* */
@@ -35,37 +35,11 @@ bool Path::makeConsistent()
 
 void Path::UpdatePaths(string nStrPath)
 {
-    /*
-	int old_size = vPath.size();
-	int i = 0;
-	string tok;
-	char *dup;
-	dup = strdup(nStrPath.c_str());
-
-	//Update the strPath
-	(*this).strPath = nStrPath;
-
-	//this will remove the old_path component in the new path
-	while(i < old_size)
-	{
-		tok = strtok(dup,".");
-		i++;
-	}
-
-	tok = strtok(dup,".");
-
-	//Update the vPath
-	while(tok.empty() != true)
-	{
-		PathComponent newComponent;
-		newComponent.label = tok;
-		vPath.push_back(newComponent);
-	}
-    */
-
+/*
     // TODO: Check if this works. Also check memory leak
     Path p(nStrPath, this->tp, this->iblob);
     this = &p;
+*/
 }
 
 
@@ -89,7 +63,7 @@ bool Path::isRef()
 	return tp->isRef(this);
 }
 
-DataType Path::getBoType()
+Type Path::getBOType()
 {
 	return tp->getBOType(this);
 }
@@ -107,19 +81,19 @@ vector<int> Path::getAccessCode()
 
 bool Path::isConsistent()
 {
-    return this->isConsistent;
+    return this->consistent;
 }
 
 void  Path::makeInconsistent()
 {
-    this->isConsistent = false;
+    this->consistent = false;
 }
 
 
 //Default Constructor
 Path::Path()
 {
-    isConsistent = false;
+    this->consistent = false;
 }
 
 
@@ -130,7 +104,7 @@ Path::Path(string strPath, TSSParser *tp, iBlob *iblob)
 	this->strPath = strPath;
 	this->tp = tp;
 	this->iblob = iblob;
-    this->isConsistent = false;
+    this->consistent = false;
     PopulateLocators();
 	/* ************************************ */
 }
@@ -148,7 +122,7 @@ int Path::PopulateLocators()
 		tempLocator = iblob->locate(tempLocator, (*it).accessCode);
 		(*it).loc = tempLocator;
     }
-    isConsistent = true;
+    consistent = true;
 	/* ****************************************** */
     return 1;
 }
@@ -157,8 +131,8 @@ int Path::PopulateLocators()
 int Path::readInt() //TODO: throws read error
 {
     if(!this->isConsistent())
-        this->makeConsistent;
-    if(this->BO && this->getBoType == INT)
+        this->makeConsistent();
+    if(this->isBO() && this->getBOType() == Int)
     {
         Locator l = this->vPath[vPath.size()].loc;
         int intVal;
@@ -177,12 +151,12 @@ int Path::readInt() //TODO: throws read error
 double Path::readDouble() //TODO: throws read error
 {
     if(!this->isConsistent())
-        this->makeConsistent;
-    if(this->BO && this->getBoType == DOUBLE)
+        this->makeConsistent();
+    if(this->isBO() && this->getBOType() == Double)
     {
         Locator l = this->vPath[vPath.size()].loc;
         double doubleVal;
-        if(readDouble(iblob->doubleVal, l))
+        if(iblob->readDouble(doubleVal, l))
             return doubleVal;
         else
             return -1;
@@ -194,11 +168,11 @@ double Path::readDouble() //TODO: throws read error
     }
 }
 
-uint readIntArray(int *intBuf, uint bufsize)
+uint Path::readIntArray(int *intBuf, uint bufsize)
 {
     if(!this->isConsistent())
-        this->makeConsistent;
-    if(this->BO && this->getBoType == INTARRAY)
+        this->makeConsistent();
+    if(this->isBO() && this->getBOType() == IntAR)
     {
         Locator l = this->vPath[vPath.size()-1].loc;
         return iblob->readIntArray(intBuf, l, bufsize); 
@@ -210,11 +184,11 @@ uint readIntArray(int *intBuf, uint bufsize)
     }
 }
 
-uint readDoubleArray(double *doubleBuf, uint bufsize)
+uint Path::readDoubleArray(double *doubleBuf, uint bufsize)
 {
     if(!this->isConsistent())
-        this->makeConsistent;
-    if(this->BO && this->getBoType == DOUBLEARRAY)
+        this->makeConsistent();
+    if(this->isBO() && this->getBOType() == DoubleAR)
     {
         Locator l = this->vPath[vPath.size()-1].loc;
         return iblob->readDoubleArray(doubleBuf, l, bufsize);
@@ -226,14 +200,14 @@ uint readDoubleArray(double *doubleBuf, uint bufsize)
     }
 }
 
-uint readBinary(unsigned char* charBuf, uint bufsize)
+uint Path::readBinary(unsigned char* charBuf, uint bufsize)
 {
     if(!this->isConsistent())
-        this->makeConsistent;
-    if(this->BO && this->getBoType == BYTE)
+        this->makeConsistent();
+    if(this->isBO() && this->getBOType() == Byte)
     {
         Locator l = this->vPath[vPath.size()-1].loc;
-        return iblob->readCharsArray(charsBuf, l, bufsize);
+        return iblob->readChars(charBuf, l, bufsize);
     }
     else
     {
@@ -242,23 +216,23 @@ uint readBinary(unsigned char* charBuf, uint bufsize)
     }
 }
 
-uint setint(int intVal)
+uint Path::setInt(int intVal)
 {
-    makeInconsistent();
+    this->makeInconsistent();
     Locator l;
 
     l = iblob->locateGlobal();
     if(l.getElements()==0)
     {
         l.insert(0,OBJECT_LEVEL);
-        l = l.locate(l, 0);
+        l = l.locate(0);
     }
 
     vector<PathComponent>::iterator it = vPath.begin();
     do
     {
         try{
-            l = iblob->locate(l,it->accessCode, OBJECT_LEVEL);
+            l = l.locate(it->accessCode);
         }
         catch(...)
         {
@@ -269,13 +243,13 @@ uint setint(int intVal)
     }while(it!= vPath.end());
     if(l.getElements() < it->accessCode)
         throw "Not Present";
-    l = iblob->setInt(intVal, l, it->accessCode);
+    l = iblob->insertInt(intVal, l, it->accessCode);
     it->loc = l;
-    this->isConsistent =  true;
+    this->consistent = true;
     return 1;
 }
 
-uint setDouble(double doubleVal)
+uint Path::setDouble(double doubleVal)
 {
     makeInconsistent();
     Locator l;
@@ -284,14 +258,14 @@ uint setDouble(double doubleVal)
     if(l.getElements()==0)
     {
         l.insert(0,OBJECT_LEVEL);
-        l = l.locate(l, 0);
+        l = l.locate(0);
     }
 
     vector<PathComponent>::iterator it = vPath.begin();
     do
     {
         try{
-            l = iblob->locate(l,it->accessCode, OBJECT_LEVEL);
+            l = l.locate(it->accessCode);
         }
         catch(...)
         {
@@ -302,13 +276,13 @@ uint setDouble(double doubleVal)
     }while(it!= vPath.end());
     if(l.getElements() < it->accessCode)
         throw "Not Present";
-    l = iblob->setDouble(doubleVal, l, it->accessCode);
+    l = iblob->insertDouble(doubleVal, l, it->accessCode);
     it->loc = l;
-    this->isConsistent =  true;
+    this->consistent =  true;
     return 1;
 }
 
-uint setIntArray(int *intBuf, uint size)
+uint Path::setIntArray(int *intBuf, uint size)
 {
     makeInconsistent();
     Locator l;
@@ -317,14 +291,14 @@ uint setIntArray(int *intBuf, uint size)
     if(l.getElements()==0)
     {
         l.insert(0,OBJECT_LEVEL);
-        l = l.locate(l, 0);
+        l = l.locate( 0);
     }
 
     vector<PathComponent>::iterator it = vPath.begin();
     do
     {
         try{
-            l = iblob->locate(l,it->accessCode, OBJECT_LEVEL);
+            l = l.locate(it->accessCode);
         }
         catch(...)
         {
@@ -337,10 +311,10 @@ uint setIntArray(int *intBuf, uint size)
         throw "Not Present";
     l = iblob->insertIntArray(intBuf, size, l,it->accessCode);
     it->loc = l;
-    this->isConsistent =  true;
+    this->consistent =  true;
     return 1;
 }
-uint setDoubleArray(double *doubleBuf, uint size)
+uint Path::setDoubleArray(double *doubleBuf, uint size)
 {
     makeInconsistent();
     Locator l;
@@ -349,14 +323,14 @@ uint setDoubleArray(double *doubleBuf, uint size)
     if(l.getElements()==0)
     {
         l.insert(0,OBJECT_LEVEL);
-        l = l.locate(l, 0);
+        l = l.locate(0);
     }
 
     vector<PathComponent>::iterator it = vPath.begin();
     do
     {
         try{
-            l = iblob->locate(l,it->accessCode, OBJECT_LEVEL);
+            l = l.locate(it->accessCode);
         }
         catch(...)
         {
@@ -367,13 +341,13 @@ uint setDoubleArray(double *doubleBuf, uint size)
     }while(it!= vPath.end());
     if(l.getElements() < it->accessCode)
         throw "Not Present";
-    l = iblob->insertIntDouble(doubleVal, size, l,it->accessCode);
+    l = iblob->insertDoubleArray(doubleBuf, size, l,it->accessCode);
     it->loc = l;
-    this->isConsistent =  true;
+    this->consistent =  true;
     return 1;
 }
 
-uint setBinary(unsigned char *charBuf, uint size)
+uint Path::setBinary(unsigned char *charBuf, uint size)
 {
     makeInconsistent();
     Locator l;
@@ -382,14 +356,14 @@ uint setBinary(unsigned char *charBuf, uint size)
     if(l.getElements()==0)
     {
         l.insert(0,OBJECT_LEVEL);
-        l = l.locate(l, 0);
+        l = l.locate(0);
     }
 
     vector<PathComponent>::iterator it = vPath.begin();
     do
     {
         try{
-            l = iblob->locate(l,it->accessCode, OBJECT_LEVEL);
+            l = l.locate(it->accessCode);
         }
         catch(...)
         {
@@ -402,7 +376,7 @@ uint setBinary(unsigned char *charBuf, uint size)
         throw "Not Present";
     l = iblob->insert(charBuf, size, l, it->accessCode);
     it->loc = l;
-    this->isConsistent =  true;
+    this->consistent =  true;
     return 1;
 }
 

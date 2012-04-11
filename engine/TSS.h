@@ -2,8 +2,8 @@
 #define TSS_H
 
 #include <iostream>
-#include "iBlob.h"
-#include "Locator.h"
+#include "../../ranjan/includes/iBLOB_V2/iBLOB/iBlob.h"
+#include "../../ranjan/includes/iBLOB_V2/iBLOB/Locator.h"
 #include "constants.h"
 #include <string>
 
