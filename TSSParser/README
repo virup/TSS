@@ -1,0 +1,52 @@
+What's done
+-----------
+1) Check syntax of the given grammar
+2) If syntax is valid, build a tree structure of the given grammar
+3) If a SO object is not defined (i.e, it is defined as SO on RHS of the grammar, but not defined on LHS) then
+throw "Object undefined" error 
+
+Things to do
+------------
+1) Generate access code of a given path (in string format) 
+2) isBO, isRO, is isSO function whose parameter is a path (in string format)
+3) Read grammar directly from txt file instead of supplying it as string
+
+Bugs
+-----
+If any bugs are found, contact me at archesh5001@gmail.com
+
+
+To run this program, enter following commands
+
+$ make
+$ ./test.out
+
+Output of the given grammar in test.cc is as follow
+---------------------------------------------------
+
+Parent: Region1 :: children: 3
+  Child(0): regionLabel
+	Child(1): face
+	Child(2): index
+
+Parent: face :: children: 3
+	Child(0): faceLabel
+	Child(1): outerCycle
+	Child(2): holeCycle
+
+Parent: index :: children: 2
+	Child(0): indexLabel
+	Child(1): SegmentIndex
+
+Parent: outerCycle :: children: 2
+	Child(0): segment
+	Child(1): segmentIndex
+
+Parent: holeCycle :: children: 1
+	Child(0): segment
+
+
+To edit the grammar, open test.cc
+Change grammar that is passed through the constructor
+
+-Archesh
