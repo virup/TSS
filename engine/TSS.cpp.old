@@ -1,0 +1,76 @@
+#ifndef TSS_CPP
+#define TSS_CPP
+
+#include "TSS.h"
+#include "../path/Path.h"
+#include "../TSSParser/TSSParser.h"
+#include "constants.h"
+
+TSS::TSS(const char *tssfile, void *mylob, void *svchp, void *errhp,  string type="default")
+{
+    this->tp = new TSSParser(tssfile, false);
+    this->type = type;
+    this->lobWrapper = new OCILobWrapper;
+    this->lobWrapper->lob=(OCILobLocator *)mylob;
+    this->lobWrapper->cntxt=(OCISvcCtx*)svchp;
+    this->lobWrapper->errhp=(OCIError*)errhp;
+    this->iblob = (iBlob *)(new mSlob(lobWrapper,true));
+}
+
+
+
+Path TSS::createPath()
+{
+    string str;
+    Path p(str,(this->tp), (this->iblob));
+    //Path p(str);
+    return p;
+}
+
+
+Path TSS::createPath(string strPath)
+{
+   Path p(strPath, (this->tp), (this->iblob));
+   //Path p(strPath);
+   return p;
+}
+
+
+
+int TSS::readInt(const Path &path)
+{
+    return path.readInt();
+}
+
+double TSS::readDouble(const Path &path)
+{
+    return path.readDouble();
+}
+
+string TSS::readString(const Path &path)
+{
+    return path.readString();
+}
+
+uint TSS::readIntArray(const Path &path, int* intBuf, uint bufsize)
+{
+    return path.readIntArray(intBuf, bufsize);
+}
+
+
+int TSS::readDoubleArray(const Path &path, double* doubleBuf, uint bufsize)
+{
+    return path.readDoubleArray(doubleBuf, bufsize);
+}
+int TSS::readBinary(const Path &path, unsigned char* doubleBuf, uint bufsize)
+{
+    return path.readBinary(doubleBuf, bufsize);
+}
+
+
+Path TSS::setInt(Path &path, string name, int value)
+{
+    return path.setInt(value); // What is the 'name' for?
+}
+#endif
+

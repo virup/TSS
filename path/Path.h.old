@@ -51,22 +51,21 @@ public:
     	bool makeConsistent();
     	void makeInconsistent();
 
-   	int readInt();// const;
-    	double readDouble();// const;
-    	string readString();// const;
-    	int readIntArray(int *intBuf, uint bufsize);// const;
-    	int readDoubleArray(double *doubleBuf, uint bufsize);// const;
-    	int readBinary(unsigned char *buf, uint bufsize);// const;
+   	uint readInt() const;
+    	double readDouble() const;
+    	string readString() const;
+    	uint readIntArray(int *intBuf, uint bufsize) const;
+    	uint readDoubleArray(double *doubleBuf, uint bufsize) const;
+    	uint readBinary(unsigned char *buf, uint bufsize) const;
 	
 
     // Write functions: Throws exception if the insertion is out of order
-    int setInt(int intVal);
-    int setDouble(double doubleVal);
-    int setIntArray(int *intBuf, uint size);
-    int setDoubleArray(double *doubleBuf, uint size);
-    int setBinary(unsigned char *charBuf, uint size);
-	
-	bool removeObj(uint idx);
+    uint setInt(int intVal);
+    uint setDouble(double doubleVal);
+    uint setIntArray(int *intBuf, uint size);
+    uint setDoubleArray(double *doubleBuf, uint size);
+    uint setBinary(unsigned char *charBuf, uint size);
+
 
     // Add string component to a path object
 	Path & operator+(string p);
@@ -74,7 +73,5 @@ public:
 
 	//Vector encapsulates pathstring + access code + iBlob
 	vector <PathComponent> vPath;
-
-    friend class TSS;
 };
 #endif

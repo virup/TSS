@@ -8,42 +8,76 @@
     # Phoenix:
 
 #Oracle envirement
-	ORACLELIB = $(ORACLE_HOME)/lib
+	#ORACLELIB = $(ORACLE_HOME)/lib
 	ORACLE_LIB1 = $(ORACLE_HOME)/lib/
 	ORACLE_LIB2 = $(ORACLE_HOME)/rdbms/lib
 	ORACLE_INCLUDE = $(ORACLE_HOME)/rdbms/public
+	RANJAN_ROOT = /home/aistdev/ranjan/includes
 
 # the linker is also "gcc". It might be something else with other compilers.
 	CC = g++ -c
 	LD = g++
+
 # Compiler flags go here.
 	CFLAGS = -ggdb -fpic -Wall
+
 #locations maybe not in path to include
-	INCLUDEIBLOB = -I ~/ranjan/includes/iBLOB_V2/iBLOB -I ~/ranjan/includes/iBLOB_V2/vector -I ~/ranjan/includes/OCILobWrapper  -I $(ORACLE_INCLUDE)
-# include OCILobWrapper
-	INCLUDEOCIWRAPPER = -I ../OCILobWrapper
+	INCLUDEIBLOB = -I $(RANJAN_ROOT)/iBLOB_V2/iBLOB -I $(RANJAN_ROOT)/iBLOB_V2/vector -I $(RANJAN_ROOT)/OCILobWrapper 
+
+#include headers from the oracle_include
+	INCLUDEORACLEHEADERS = -I $(ORACLE_INCLUDE)
+
 # use this command to erase files.
 	RM = /bin/rm -f
+
 #Linker flags go here.
-	LDFLAGSSTAL = -L$(ORACLE_LIB1) -L$(ORACLE_LIB2) -L$(RJNLIBS) -limslobs
+	LDFLAGSSTAL = -L$(ORACLE_LIB1) -L$(ORACLE_LIB2)  -L$(RJNLIBS) -limslobs -locci
+
 #sources
-	SRCTSS = ../path/Path.cc ../TSSParser/TSSParser.cc
-	OBJPATH = ../path/path.o #../TSSParser/TSSParser.o
+	SRCTSS = ../path/Path.cc ../TSSParser/TSSParser.cc ../TSSParser/Scanner.cc TSS.cpp
+	#OBJPATH = ../path/Path.o ../TSSParser/TSSParser.o TSS.o
+	OBJPATH = Path.o TSSParser.o TSS.o
+
+#test related components
+	TESTSRC = test.cc
+	TESTOBJ = test.o
+
 #testpath
 	TESTPATH = test.cc
 	OTESTPATH = test.o
-
 	OUTFILE = test.out
 
-teststal:
-	@echo "start testing path..."
-	$(CC) $(CFLAGS) $(INCLUDEIBLOB)  $(SRCTSS)
-	$(LD) -o $(OUTFILE) $(TESTPATH) $(OBJPATH) $(LDFLAGSSTAL)
-	@echo "Done!"
+
+test.out: $(OBJPATH) $(TESTOBJ)
+	@echo "start LINKING and LOADING"
+	$(LD) -o $(OUTFILE) $(TESTOBJ) $(ORACLELIB) $(OBJPATH) $(LDFLAGSSTAL) Scanner.o
+	@echo "-----------------Done!-------------------"
+
+TSSParser.o:../TSSParser/TSSParser.cc ../TSSParser/Scanner.cc
+	@echo "TSSParser begin compilation ..."
+	$(CC) $(CFLAGS) $(INCLUDEIBLOB) $(INCLUDEORACLEHEADERS) ../TSSParser/TSSParser.cc ../TSSParser/Scanner.cc
+	@echo "TSSParser done"
+
+test.o: test.cc
+	@echo "Test file begin compilation ..."
+	$(CC) $(CFLAGS) $(TESTSRC) $(INCLUDEIBLOB) $(INCLUDEORACLEHEADERS)
+	@echo "Test File Done ..."
+
+Path.o: ../path/Path.cc
+	@echo "Path begin compilation ..."
+	$(CC) $(CFLAGS) $(INCLUDEIBLOB)  $(INCLUDEORACLEHEADERS) ../path/Path.cc
+	@echo "Path Done!"
+
+TSS.o:TSS.cpp
+	@echo "TSS Engine begin compilation..."
+	$(CC) $(CFLAGS) $(INCLUDEIBLOB) $(INCLUDEORACLEHEADERS) TSS.cpp
+	@echo "TSS Engine Done "
+
 
 #clean libs
-clean_libs:
-	rm $(RJNLIBS)/$(LIBSHARED)
+#clean_libs:
+	#rm $(RJNLIBS)/$(LIBSHARED)
+
 
 clean:
 	-rm *.o

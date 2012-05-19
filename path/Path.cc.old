@@ -127,14 +127,15 @@ int Path::PopulateLocators()
     return 1;
 }
 
-int Path::readInt() //TODO: throws read error
+
+uint Path::readInt() //TODO: throws read error
 {
     if(!this->isConsistent())
         this->makeConsistent();
     if(this->isBO() && this->getBOType() == Int)
     {
         Locator l = this->vPath[vPath.size()].loc;
-        int intVal;
+        uint intVal;
         if(iblob->readInt(intVal, l))
             return intVal;
         else
@@ -145,35 +146,6 @@ int Path::readInt() //TODO: throws read error
         //TODO: Throw exception
         return -1; // this is not logically correct
     }
-}
-
-string Path::readString()
-{
-	if(!this->isConsistent())
-		this->makeConsistent();
-	unsigned char u_array[25];
-	uint strsize = 25;
-
-	if(this->isBO()) //&& this->getBOType() == Binary)
-	{
-		Locator l = this->vPath[vPath.size()].loc;
-		if(iblob->readChars(u_array, l, strsize))
-		{
-			string str( u_array, u_array + sizeof u_array / sizeof u_array[0]);
-			return str;
-		}
-		else
-		{
-			string str(" ");
-			return str;
-		}
-	}
-	else
-	{
-		string str(" "); //Should actually throw an exception here 
-		return str;
-	}
-
 }
 
 double Path::readDouble() //TODO: throws read error
@@ -196,7 +168,7 @@ double Path::readDouble() //TODO: throws read error
     }
 }
 
-int Path::readIntArray(int *intBuf, uint bufsize)
+uint Path::readIntArray(int *intBuf, uint bufsize)
 {
     if(!this->isConsistent())
         this->makeConsistent();
@@ -212,7 +184,7 @@ int Path::readIntArray(int *intBuf, uint bufsize)
     }
 }
 
-int Path::readDoubleArray(double *doubleBuf, uint bufsize)
+uint Path::readDoubleArray(double *doubleBuf, uint bufsize)
 {
     if(!this->isConsistent())
         this->makeConsistent();
@@ -228,7 +200,7 @@ int Path::readDoubleArray(double *doubleBuf, uint bufsize)
     }
 }
 
-int Path::readBinary(unsigned char* charBuf, uint bufsize)
+uint Path::readBinary(unsigned char* charBuf, uint bufsize)
 {
     if(!this->isConsistent())
         this->makeConsistent();
@@ -244,7 +216,7 @@ int Path::readBinary(unsigned char* charBuf, uint bufsize)
     }
 }
 
-int Path::setInt(int intVal)
+uint Path::setInt(int intVal)
 {
     this->makeInconsistent();
     Locator l;
@@ -277,7 +249,7 @@ int Path::setInt(int intVal)
     return 1;
 }
 
-int Path::setDouble(double doubleVal)
+uint Path::setDouble(double doubleVal)
 {
     makeInconsistent();
     Locator l;
@@ -310,7 +282,7 @@ int Path::setDouble(double doubleVal)
     return 1;
 }
 
-int Path::setIntArray(int *intBuf, uint size)
+uint Path::setIntArray(int *intBuf, uint size)
 {
     makeInconsistent();
     Locator l;
@@ -342,7 +314,7 @@ int Path::setIntArray(int *intBuf, uint size)
     this->consistent =  true;
     return 1;
 }
-int Path::setDoubleArray(double *doubleBuf, uint size)
+uint Path::setDoubleArray(double *doubleBuf, uint size)
 {
     makeInconsistent();
     Locator l;
@@ -375,7 +347,7 @@ int Path::setDoubleArray(double *doubleBuf, uint size)
     return 1;
 }
 
-int Path::setBinary(unsigned char *charBuf, uint size)
+uint Path::setBinary(unsigned char *charBuf, uint size)
 {
     makeInconsistent();
     Locator l;
@@ -408,37 +380,3 @@ int Path::setBinary(unsigned char *charBuf, uint size)
     return 1;
 }
 
-bool Path::removeObj(uint idx)
-{
-	//get locator
-	Locator l;
-	l = iblob->locateGlobal();
-    
-	if(l.getElements()==0)
-    	{
-        	l.insert(0,OBJECT_LEVEL);
-        	l = l.locate(0);
-    	}
-
-        vector<PathComponent>::iterator it = vPath.begin();
-
-        while(it != vPath.end())
-        {
-    	    try
-            {
-            	l = l.locate(it->accessCode);
-            }
-            catch(...)
-            {
-            	l = iblob->insert(l,it->accessCode, OBJECT_LEVEL);
-            	it->loc = l;
-            }
-	it++;
-    	}
-
-	if(l.getElements() < it->accessCode)
-        throw "Not Present";
-
-	//call iBlob remove for the locator
-	return iblob->remove(l, idx);
-}
