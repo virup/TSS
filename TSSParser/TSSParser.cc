@@ -14,9 +14,20 @@ TSSParser::TSSParser() {
 
 TSSParser::TSSParser(string grammar, bool isFile) {
     //will take care of file input later
+    if(!isFile)
+    {
+
+    }
+    else
+    {
+
+
+    }
     this->grammar = new string(grammar);
     childCounter = 0;
     head = NULL;
+    validateGrammar();
+    buildTree(*this->grammar);
 }
 
 TSSParser::~TSSParser() {
@@ -219,6 +230,8 @@ void TSSParser::buildTree(string &str) {
             head->children.insert(pair<string, Node*>(current->name, current));
         //}
     }
+    //cout<<"===================="<<endl;
+    //cout<<"Head =  "<<head<<endl;
 
 }
 
@@ -299,31 +312,31 @@ void TSSParser::linkTrees() {
 
 }
 
-bool TSSParser::storeAccessCode(string path, vector<PathComponent>& pathVector) {
+bool TSSParser::storeAccessCode(string strpath, vector<PathComponent>& pathVector) {
     //first step is tokenize the path string. The format of such string will be as follow
     //objectName.objectName[index].objectName[index].objectName
     //where objectName is of type string, and index will be some number. If we find a number, 
     //we simply ignore it.
-    cout << "Storing access code\n";
     bool returnVal = true;
     char * tmp;
     string * str;
     PathComponent pathComp;
-    tmp = strtok((char*) path.c_str(), ".[]");
+    char *path = new char[strpath.length()];
+    strpath.copy(path,strpath.length());
+    tmp = strtok((char*) path, ".[]");
     while (tmp != NULL) {
-        //cout << tmp << endl;
         str = new string(tmp);
         if (!isdigit(str->at(0))) {
             pathComp.label = *str;
             pathVector.push_back(pathComp);
         }
-
         tmp = strtok(NULL, ".[]");
     }
 
-    Node * current = head;
+    Node * current = this->head;
     //now we have the path stored in vector. Traverse the tree with this path and store the
     //access code in the pathVector
+    //cout<<"storeAccessCode   "<<pathVector.at(0).label<<endl;
     if (head->name.compare(pathVector.at(0).label) == 0) {
         pathVector.at(0).accessCode = 0;
         for (int i = 1; i < pathVector.size(); i++) {
@@ -342,7 +355,6 @@ bool TSSParser::storeAccessCode(string path, vector<PathComponent>& pathVector) 
         cout << "Path is invalid\n";
         returnVal = false;
     }
-
     return returnVal;
 }
 
@@ -536,16 +548,16 @@ bool TSSParser :: matchRO() {
                     break;
                 }
             }
-            
+
             if(!found) {
                 cout << "RO Object or RO pointer not found\n";
                 return false;
             }
-            
+
             found = false;
         }
     }
-    
+
     return true;
 }
 
@@ -578,5 +590,5 @@ void TSSParser::linkNodes(Node* a, Node* b) {
 
 string TSSParser::getGrammarType()
 {
-	return head->name;
+    return head->name;
 }

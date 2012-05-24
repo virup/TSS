@@ -12,7 +12,7 @@
 #include <cstring>
 #include <vector>
 #include <string>
-
+#include "Locator.h"
 using namespace std;
 
 //TSS path class ... every path is stored as an instance of this class
@@ -39,6 +39,8 @@ private:
 	Path ();
 	Path (string strPath, TSSParser *tp, iBlob *iblob);
 
+    // Helper function to iterate to a BO
+    Locator gotoBO();
 
 public:
 	bool isBO();
@@ -46,18 +48,18 @@ public:
    	bool isRef();
 	bool isList();
 	Type getBOType();
-    	vector<int> getAccessCode();
-    	bool isConsistent();
-    	bool makeConsistent();
-    	void makeInconsistent();
+    vector<int> getAccessCode();
+    bool isConsistent();
+    bool makeConsistent();
+    void makeInconsistent();
 
-   	int readInt();// const;
-    	double readDouble();// const;
-    	string readString();// const;
-    	int readIntArray(int *intBuf, uint bufsize);// const;
-    	int readDoubleArray(double *doubleBuf, uint bufsize);// const;
-    	int readBinary(unsigned char *buf, uint bufsize);// const;
-	
+    int readInt();// const;
+    double readDouble();// const;
+    string readString();// const;
+    int readIntArray(int *intBuf, uint bufsize);// const;
+    int readDoubleArray(double *doubleBuf, uint bufsize);// const;
+    int readBinary(unsigned char *buf, uint bufsize);// const;
+
 
     // Write functions: Throws exception if the insertion is out of order
     int setInt(int intVal);
@@ -65,7 +67,8 @@ public:
     int setIntArray(int *intBuf, uint size);
     int setDoubleArray(double *doubleBuf, uint size);
     int setBinary(unsigned char *charBuf, uint size);
-	
+	int setRefTo(Path &path, int idx);
+
 	bool removeObj(uint idx);
 
     // Add string component to a path object
@@ -74,6 +77,9 @@ public:
 
 	//Vector encapsulates pathstring + access code + iBlob
 	vector <PathComponent> vPath;
+
+	//Count that counts the number of subobjects of the locator pointed to by a path
+	int count();
 
     friend class TSS;
 };

@@ -1,48 +1,152 @@
-In file included from TSS.cpp:4:
-TSS.h:31: error: ISO C++ forbids declaration of ‘setTypeSpec’ with no type
-TSS.h:32: error: ISO C++ forbids declaration of ‘setStoreHandle’ with no type
-In file included from TSS.cpp:4:
-TSS.h:78: error: expected ‘;’ before ‘friend’
-TSS.h:79: error: invalid use of incomplete type ‘struct Path’
-constants.h:15: error: forward declaration of ‘struct Path’
-TSS.h:89: error: declaration of ‘struct TSS::OCILobWrapper’
-/home/aistdev/ranjan/includes/iBLOB_V2/iBLOB/imSlobstream.h:25: error: changes meaning of ‘OCILobWrapper’ from ‘struct OCILobWrapper’
-TSS.h:93: error: declaration of ‘typedef struct TSS::OCILobWrapper TSS::OCILobWrapper’
-/home/aistdev/ranjan/includes/iBLOB_V2/iBLOB/imSlobstream.h:25: error: changes meaning of ‘OCILobWrapper’ from ‘struct OCILobWrapper’
-TSS.cpp:7: error: prototype for ‘TSS::TSS(const char*, void*, void*, void*, std::string)’ does not match any in class ‘TSS’
-TSS.h:22: error: candidates are: TSS::TSS(const TSS&)
-TSS.h:27: error:                 TSS::TSS(const char*, bool)
-TSS.h:25: error:                 TSS::TSS()
-TSS.cpp: In member function ‘Path TSS::createPath()’:
-TSS.cpp:20: error: return type ‘struct Path’ is incomplete
-TSS.cpp:22: error: variable ‘Path p’ has initializer but incomplete type
-TSS.cpp: In member function ‘Path TSS::createPath(std::string)’:
-TSS.cpp:27: error: return type ‘struct Path’ is incomplete
-TSS.cpp:29: error: variable ‘Path p’ has initializer but incomplete type
-TSS.cpp:29: error: ‘strpath’ was not declared in this scope
-TSS.cpp: In member function ‘int TSS::readInt(const Path&)’:
-TSS.cpp:37: error: invalid use of incomplete type ‘const struct Path’
-constants.h:15: error: forward declaration of ‘const struct Path’
-TSS.cpp: In member function ‘double TSS::readDouble(const Path&)’:
-TSS.cpp:42: error: invalid use of incomplete type ‘const struct Path’
-constants.h:15: error: forward declaration of ‘const struct Path’
-TSS.cpp: In member function ‘std::string TSS::readString(const Path&)’:
-TSS.cpp:50: error: invalid use of incomplete type ‘const struct Path’
-constants.h:15: error: forward declaration of ‘const struct Path’
-TSS.cpp: In member function ‘uint TSS::readIntArray(const Path&, int*, uint)’:
-TSS.cpp:55: error: invalid use of incomplete type ‘const struct Path’
-constants.h:15: error: forward declaration of ‘const struct Path’
-TSS.cpp: In member function ‘int TSS::readDoubleArray(const Path&, double*, uint)’:
-TSS.cpp:61: error: invalid use of incomplete type ‘const struct Path’
-constants.h:15: error: forward declaration of ‘const struct Path’
-TSS.cpp: In member function ‘int TSS::readBinary(const Path&, unsigned char*, uint)’:
-TSS.cpp:65: error: invalid use of incomplete type ‘const struct Path’
-constants.h:15: error: forward declaration of ‘const struct Path’
-TSS.cpp: In member function ‘Path TSS::setInt(Path&, std::string, int)’:
-TSS.cpp:69: error: return type ‘struct Path’ is incomplete
-TSS.cpp:71: error: invalid use of incomplete type ‘struct Path’
-constants.h:15: error: forward declaration of ‘struct Path’
-TSS.h: At global scope:
-TSS.h:18: warning: ‘username’ defined but not used
-TSS.h:19: warning: ‘password’ defined but not used
-make: *** [TSS.o] Error 1
+1 rows were deleted from the 'TEST_IBLOBS' table 
+Inserted empty blob with id 1
+Retrieved tuple with ID: 1
+--------------------------------------------
+Building individual tree
+Building done
+Pointer(0) --> segmentIndex
+Object(0) --> segmentIndex
+Linking started
+Linking done
+Storing access code
+Storing access code
+Storing access code
+Storing access code
+Storing access code
+Storing access code
+Storing access code
+Storing access code
+Storing access code
+Storing access code
+Storing access code
+Storing access code
+Storing access code
+Storing access code
+Storing access code
+Paths constructed
+Size = 32
+1
+3
+1.5
+0.5
+Going to gotoBO
+region.face[0].outerCycle[0].segment[0]
+1
+2
+3
+0    0
+3
+0    1
+Locate error: Invalid idx. Not enough elements to reach idx provided.
+Path::gotoBO - Discontinuity detected
+ERROR!!
+Size = 32
+1.5
+0.5
+3
+0.5
+Going to gotoBO
+region.face[0].outerCycle[0].segment[1]
+1
+2
+3
+1    0
+3
+1    1
+3
+0    1
+Locate error: Invalid idx. Not enough elements to reach idx provided.
+Path::gotoBO - Discontinuity detected
+0Size = 32
+3
+0.5
+3
+2
+Going to gotoBO
+region.face[0].outerCycle[0].segment[2]
+1
+2
+3
+1    0
+3
+2    1
+3
+0    1
+Locate error: Invalid idx. Not enough elements to reach idx provided.
+Path::gotoBO - Discontinuity detected
+0Size = 32
+3
+2
+1
+3
+Going to gotoBO
+region.face[0].outerCycle[0].segment[3]
+1
+2
+3
+1    0
+3
+2    1
+3
+0    1
+Locate error: Invalid idx. Not enough elements to reach idx provided.
+Path::gotoBO - Discontinuity detected
+0Size = 32
+5
+1
+7
+1
+Going to gotoBO
+region.face[1].outerCycle[0].segment[0]
+1
+2
+3
+1    0
+3
+2    1
+3
+0    1
+Locate error: Invalid idx. Not enough elements to reach idx provided.
+Path::gotoBO - Discontinuity detected
+0Size = 32
+7
+1
+6
+3
+Going to gotoBO
+region.face[1].outerCycle[0].segment[1]
+1
+2
+3
+1    0
+3
+2    1
+3
+0    1
+Locate error: Invalid idx. Not enough elements to reach idx provided.
+Path::gotoBO - Discontinuity detected
+0Size = 32
+6
+3
+5
+1
+Going to gotoBO
+region.face[1].outerCycle[0].segment[2]
+1
+2
+3
+1    0
+3
+2    1
+3
+0    1
+Locate error: Invalid idx. Not enough elements to reach idx provided.
+Path::gotoBO - Discontinuity detected
+0
+Reading back
+Error in reading
+0
+6.93082e-310
+0
+6.93082e-310
+Time to load data to BLOB: 2.797000 ms 

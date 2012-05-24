@@ -1,3 +1,4 @@
+
 #ifndef TSS_CPP
 #define TSS_CPP
 
@@ -22,12 +23,14 @@ static  uint myid;
 
 TSS::TSS(const char *tssfile, void *mylob, void *svchp, void *errhp,  string type="default")
 {
+   
     this->tp = new TSSParser(tssfile, false);
     this->type = type;
     this->lobWrapper = new OCILobWrapper;
     this->lobWrapper->lob=(OCILobLocator *)mylob;
     this->lobWrapper->cntxt=(OCISvcCtx*)svchp;
     this->lobWrapper->errhp=(OCIError*)errhp;
+//    this->iblob = (iBlob *)(new mSlob(lobWrapper,true));
     this->iblob  = new iBlob(this->lobWrapper, true);
 }
 
@@ -37,20 +40,21 @@ TSS::TSS(const char *grammarString, string type)
 	this->type = type;
 }
 
-//TODO: one argument should be the data type name. Has been removed?  
+
 TSS::TSS(const char *grammarString, string serverPath, string username, string password, bool isFile)
 {
 	this->tp = new TSSParser(grammarString, false);
 	//this->type = ;
 	establishConnection(serverPath, username, password);
+    
     this->lobWrapper->lob= mylob;
    this->lobWrapper->cntxt=svchp;
     this->lobWrapper->errhp=errhp;
+//    this->iblob = (iBlob *)(new mSlob(lobWrapper,true));
     this->iblob  = new iBlob(this->lobWrapper, true);
 
 }
 
-//TODO: What does this function do exactly?
 TSS::TSS(const char* tssfile, bool isFile)
 {
 	//need the TSS Parser Constructor that can handle file -> in ../TSSParser/Parser.h -> indicated that this will be implemented later.
@@ -59,8 +63,6 @@ TSS::TSS(const char* tssfile, bool isFile)
 TSS::TSS()
 {}
 
-
-//TODO: IMPORTANT to implement it. Otherwise there are memory leaks
 TSS::~TSS()
 {}
 
@@ -125,7 +127,7 @@ int TSS::establishConnection(string connectionString, string username, string pa
     (void) OCIHandleAlloc( (dvoid *) envhp, (dvoid **) &errhp, OCI_HTYPE_ERROR,
             (size_t) 0, (dvoid **) 0);
 
-    // server contexts
+    // server contexts 
     (void) OCIHandleAlloc( (dvoid *) envhp, (dvoid **) &srvhp, OCI_HTYPE_SERVER,
             (size_t) 0, (dvoid **) 0);
 
@@ -267,12 +269,20 @@ void TSS::closeConnection()
 
 }
 
+/*PHASE OUT/
+void TSS::setTypeSpec(const char* tssfile, bool isFile)
+{
+	this->type = tp->getGrammarType();
+}
 
+/*PHASE OUT/
+void TSS::setStoreHandle(void* b, bool ismem)
+{}
+*/
 
-//TODO: Check if it works or not.
 Path TSS::createPath()
 {
-    string str = "";
+    string str;
     Path *p = new Path(str,(this->tp), (this->iblob));
     return *p;
 }
@@ -316,7 +326,7 @@ int TSS::readBinary(Path &path, unsigned char* doubleBuf, uint bufsize)
 
 Path TSS::setInt(Path &path, int value)
 {
-     path.setInt(value);
+     path.setInt(value); 
      return path;
 }
 
@@ -338,35 +348,9 @@ Path TSS::setDoubleArray(Path &path, double array[], uint length)
 	return path;
 }
 
-
-
-//TODO: This logic has to be put in the Path class's function for setString.
 Path TSS::setString(Path &path, string value)
 {
-
-	uint length = (unsigned int) value.size(); // this can be dangerous--WHY?
-	//set the first 10 characters in the string to represent string length in decimal notation.
-	//convert the length into a string
-	string len;
-	string toAppend;
-	stringstream out;
-	out << length;
-	len = out.str();
-	//len is now the string representation of the lenght of  the string
-	//if the lenght is less that 10 digits (decimal notation), then pad the digits with 0's
-	if(len.size() < 10)
-	{
-		for(int  i = 0 ; i < 10 - len.size() ; i++)
-		{
-			toAppend.append("0");
-		}
-        toAppend.append(len);
-	}
-	else
-	{ //THROW EXCEPTION :: STRING TOO LARGE
-		cout<< "String too large to fit in the iBlob " << "handle this better?" << endl;
-	}
-	value.append(toAppend);
+	uint length = (unsigned int) value.size(); // this can be dangerous
 	path.setBinary((unsigned char *) value.c_str(), length);
 	return path;
 }
@@ -384,10 +368,11 @@ int TSS::count(Path &path)
 	return path.count();
 }
 
-
-Path setRef(Path &objp1, Path &objp2, int idx)
+//IMPLEMENT
+Path setRef(const Path &objp1, Path &objp2, string name2)
 {
-	objp2.setRefTo(objp1, idx);
+
+
 }
 
 bool remove(Path &path, uint idx)

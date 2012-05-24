@@ -15,8 +15,8 @@
 	RANJAN_ROOT = /home/aistdev/ranjan/includes
 
 # the linker is also "gcc". It might be something else with other compilers.
-	CC = g++ -c
-	LD = g++
+	CC = g++ -g -c
+	LD = g++ -g 
 
 # Compiler flags go here.
 	CFLAGS = -ggdb -fpic -Wall
@@ -39,11 +39,11 @@
 	OBJPATH = Path.o TSSParser.o TSS.o
 
 #test related components
-	TESTSRC = test.cc
+	TESTSRC = test.cpp
 	TESTOBJ = test.o
 
 #testpath
-	TESTPATH = test.cc
+	TESTPATH = test.cpp
 	OTESTPATH = test.o
 	OUTFILE = test.out
 
@@ -58,7 +58,7 @@ TSSParser.o:../TSSParser/TSSParser.cc ../TSSParser/Scanner.cc
 	$(CC) $(CFLAGS) $(INCLUDEIBLOB) $(INCLUDEORACLEHEADERS) ../TSSParser/TSSParser.cc ../TSSParser/Scanner.cc
 	@echo "TSSParser done"
 
-test.o: test.cc
+test.o: test.cpp
 	@echo "Test file begin compilation ..."
 	$(CC) $(CFLAGS) $(TESTSRC) $(INCLUDEIBLOB) $(INCLUDEORACLEHEADERS)
 	@echo "Test File Done ..."
