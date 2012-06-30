@@ -66,7 +66,7 @@ class TSS
         Path setDoubleArray(Path &path, double array[], uint length); // set the double array for a base object
         Path setString(Path &path, string value); // set the string value for a base object
         Path setBinary(Path &path, unsigned char* binaryarray, uint length); // set the binary value for a base object
-        Path setRef(const Path &objp1, Path &objp2, int idx); // set the ref in objp2.index pointing to objp1
+        Path setRef(Path &objp1, Path &objp2, int idx); // set the ref in objp2.index pointing to objp1
 
         /* Read Functions iff. path.isBO == true */
         int readInt(Path &path);       // read a int value from a BO

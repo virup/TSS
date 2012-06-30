@@ -81,6 +81,15 @@ public:
 	//Count that counts the number of subobjects of the locator pointed to by a path
 	int count();
 
+
+    // Added code to use the same set function for all the base object writing
+    int set(int);
+    int set(double);
+    int set(int *, int size);
+    int set(double *, int size);
+    int set(unsigned char *, int size);
+    int set(Path &path, int idx);
+
     friend class TSS;
 };
 #endif

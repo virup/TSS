@@ -5,27 +5,19 @@
  *      Author: Archesh
  */
 
+#include "TSSParser.h"
 #include <iostream>
-#include "TSSParser/TSSParser.h"
 using namespace std;
 
 int main() {
 
-/*
+
     TSSParser parser("<gObj:SO> -= <Object1:SO>(*object1Ref) <Object2:SO>[](*Object1Ref) <Object3:RO>[];"
                     "<Object1:SO> -= <Object1Base:DA>[] <o1struct:SO>(*object1StructRef);"
                     "<Object2:SO> -= <Object2Base:S>;"
                     "<o1struct:SO> -= <Object1StructureBase:IA>[];"
                     , false);
-                    */
-    TSSParser parser("S = {region, index};"
-                     "R = {segmentindex};"
-                     "B = {segment:DA};"
-                     "region ::= segment:DA segmentindex;"
-                     
-                     , false);
 
-    cout<<"Done!!!!!!"<<endl;
     if (parser.validateGrammar()) {
         vector<PathComponent> vect;
         if (parser.storeAccessCode("gObj.Object1.o1struct.Object1StructureBase[5]", vect)) {

@@ -385,9 +385,16 @@ int TSS::count(Path &path)
 }
 
 
-Path setRef(Path &objp1, Path &objp2, int idx)
+Path TSS::setRef(Path &objp1, Path &objp2, int idx)
 {
+    try{
 	objp2.setRefTo(objp1, idx);
+    return objp2;
+    }
+    catch(...)
+    {
+        cout<<"exception in setRef"<<endl;
+    }
 }
 
 bool remove(Path &path, uint idx)

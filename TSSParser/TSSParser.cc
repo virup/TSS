@@ -5,6 +5,8 @@
 #include <queue>
 #include <string>
 #include <iostream>
+#include <algorithm>
+#include <sstream>
 using namespace std;
 
 TSSParser::TSSParser() {
@@ -26,8 +28,8 @@ TSSParser::TSSParser(string grammar, bool isFile) {
     this->grammar = new string(grammar);
     childCounter = 0;
     head = NULL;
-    validateGrammar();
-    buildTree(*this->grammar);
+    validateGrammar_1();
+    //buildTree_1(*this->grammar);
 }
 
 TSSParser::~TSSParser() {
@@ -36,6 +38,151 @@ TSSParser::~TSSParser() {
     ROObjects.clear();
     delete grammar;
 
+}
+
+
+vector<string> TSSParser::tokenize(string s, string separator)
+{
+    std::stringstream ss(s);
+    vector<std::string> elems;
+    std::string item;
+    while(std::getline(ss, item, *separator.c_str())) {
+        elems.push_back(item);
+    }
+    return elems;
+}
+
+
+string trim(string& str)
+{
+    char avoidChars[] = "& ;+=";
+    for (unsigned int i = 0; i < sizeof(avoidChars); ++i)
+    {
+        str.erase (std::remove(str.begin(), str.end(), avoidChars[i]),
+                str.end());
+    }
+    cout<<"Trim : "<<str<<endl;
+
+    return str;
+
+}
+bool isInside(vector<string> list, string word)
+{
+    cout<<"Searching for "<<word<<endl;
+    string w = trim(word);
+    for(int i = 0; i < list.size(); i++)
+        if(trim(list[i]).compare(w))
+            return true;
+
+    cout<<"False"<<endl;
+    return false;
+}
+
+
+bool TSSParser::validateGrammar_1(){
+    vector<string> statements = tokenize(*this->grammar, ";");
+    vector<string> so;
+    vector<string> ro;
+    vector<string> bo;
+    //map<TSSParser::Node> nodeMaps;
+    for(int i = 0; i < statements.size(); i++)
+    {
+        cout<<endl<<endl<<statements[i]<<endl<<endl;
+        if(statements[i].find("{") != string::npos)
+        {
+            vector<string> set = tokenize(statements[i], "=");
+            if(set.size() != 2)
+            {
+                cerr<<"Error in the statement : "<<statements[i]<<endl;
+                throw "Error in statement";
+            }
+            else
+            {
+                vector<string> setmidend = tokenize(set[1], "{");
+                vector<string> setmid = tokenize(setmidend[1],"}");
+                if(setmid.size() == 0)
+                {
+                    cerr<<"Error in statement "<<statements[i]<<endl;
+                    throw "Error in statement";
+                }
+                vector<string> names = tokenize(setmid[0], ",");
+                if(set[0].find("S") != string::npos)
+                {
+                    so.insert(so.begin(), names.begin(), names.end());
+                    // Trim each word
+                    // Check all the so items
+                }
+                else if(set[0].find("R") != string::npos)
+                {
+                    cout<<names[0]<<endl;
+                    ro.insert(ro.begin(), names.begin(), names.end());
+                    //trim each word
+                    // Check all the ro items
+                }
+                else if(set[0].find("B") != string::npos)
+                {
+                    bo.insert(bo.begin(), names.begin(), names.end());
+                    // trim each word
+                    // Check all the bo items
+                }
+            }
+        }
+        else // normal statment
+        {
+            cout<<"Normal statement"<<endl;
+            string statement = statements[i];
+            size_t pos = statement.find("::=");
+            if(pos == string::npos)
+            {
+                cerr<<"Not a well formed statement : "<<statements[i]<<endl;
+                throw "Not a well formed statment";
+            }
+            string RHS = statement.substr(pos + 3 );
+            string LHS = statement.substr(0,pos);
+            vector<string> RHSs = tokenize(RHS, " ");
+            cout<<"::: LHS = "<<LHS<<endl;
+            if(isInside(so,LHS)) // LHS == SO
+            {
+                for(int j= 0; j < RHSs.size(); j++)
+                {
+                    cout<<"Checking "<<RHSs[j]<<endl;
+                    if(!isInside(so,RHSs[j]) && !isInside(ro,RHSs[j]) && !isInside(bo, RHSs[j]))
+                    {
+                        cerr<<RHSs[j]<<"Not found in "<<statements[i]<<endl;
+                        throw "Error in statements";
+                    }
+                    if(RHSs[j] == LHS)
+                    {
+                        cerr<<RHSs[j]<<"is recursive in "<<statements[i]<<endl;
+                        throw "Error in statements";
+                    }
+                }
+            }
+            else if(isInside(ro, LHS)) //LHS == RO
+            {
+                cout<<"REFERENCE OBJECT : "<<RHSs[0]<<endl;
+                if(RHSs.size() > 1)
+                {
+                    cerr<<"RO should point to only one object "<<statements[i]<<endl;
+                    throw "Error in statement";
+                }
+                if(RHSs[0][0] != '&')
+                {
+                    cerr<<"Expected &SO or &RO in the right hand side of  "<<statements[i]<<endl;
+                    throw "Error in statement";
+                }
+                if(!isInside(so,RHSs[0]) && !isInside(bo, RHSs[0]))
+                {
+                    cerr<<RHSs[0]<<" not in S set or B set in "<<statements[i]<<endl;
+                    throw "Error in statement";
+                }
+            }
+        else{
+            cerr<<LHS<< " not in S set or R set in "<<statements[i]<<endl;
+            throw "Error in statement";
+        }
+        }
+    }
 }
 
 bool TSSParser::validateGrammar() {

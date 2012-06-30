@@ -64,13 +64,10 @@ TSS.o:engine/TSS.cpp
 	@echo "TSS Engine Done "
 
 
-#clean libs
-#clean_libs:
-	#rm $(RJNLIBS)/$(LIBSHARED)
-
-
 clean:
 	-rm *.o
 	-rm *.out
 	-rm *.so
-	-rm *.a
+	$(RM) *.a
+	$(RM) engine/*.o
+	$(RM) engine/*.save*

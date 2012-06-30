@@ -74,7 +74,7 @@ class TSSParser
         //this function is need to store heads in vector
         void copy(Node *a, Node *b);
 
-        //this function is used to link individual nodes formed in buildTree() function. It 
+        //this function is used to link individual nodes formed in buildTree() function. It
         //is used by linkTree() function
         void linkNodes(Node *a ,Node *b);
 
@@ -82,6 +82,7 @@ class TSSParser
         //provided in the grammar. Then, it stores the head
         //of each tree in the list.
         void buildTree(string &);
+        void buildTree(vector<Node>);
 
         //this function links all the trees together in to 1 tree
         //using BFS algorithm
@@ -98,6 +99,9 @@ class TSSParser
         //visit all nodes and delete it to free up memory
         void cleanUp();
 
+        // Tokenize a string
+        vector<string> tokenize(string, string);
+
 
     public:
 
@@ -106,19 +110,20 @@ class TSSParser
                                                 // isFile == true
         ~TSSParser();
          bool validateGrammar();   // Validate the given grammar
+         bool validateGrammar_1();   // Validate the given grammar
 
         //This function will break the objects from path string, and store corresponding
         //label and accesscode in pathVector. If the given string path is invalid, then
         //this function will return false
         bool storeAccessCode(string path, vector<PathComponent>&);
-        
+
         //This function will simply get pathVector from Path p object and
         //extract the access code from it. It will then return an int array
         //that contains the access code.
         int* genAccessCode(Path *p);           // Generate access code
 
         //This following 4 functions will traverse the grammar tree
-        //and check whether the last object specified in path is BO, 
+        //and check whether the last object specified in path is BO,
         // SO, List, or Ref.
         bool isBO(Path *p);
         bool isSO(Path *p);
@@ -126,13 +131,11 @@ class TSSParser
         bool isRef(Path *p);
 
 	//return the root's type , this holds the data type of the TSS that the grammar describes
-	string getGrammarType(); 
-        
-	//If the type of a particular object in grammar is BO, then 
-        //following function will return the exact type of that BO. 
+	string getGrammarType();
+
+	//If the type of a particular object in grammar is BO, then
+        //following function will return the exact type of that BO.
         //Type could be Int, IntAR, Double, DoubleAR, String, or Byte
         Type getBOType(Path *p);
-        
-        
 };
 #endif	/* TSSPARSER_H */

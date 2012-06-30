@@ -203,7 +203,7 @@ double Path::readDouble() //TODO: throws read error
         this->makeConsistent();
     if(this->isBO() && this->getBOType() == Double)
     {
-        Locator l = this->vPath[vPath.size()].loc;
+        Locator l = this->vPath[vPath.size()-1].loc;
         double doubleVal;
         if(iblob->readDouble(doubleVal, l))
             return doubleVal;
@@ -237,8 +237,10 @@ int Path::readDoubleArray(double *doubleBuf, uint bufsize)
 {
     if(!this->isConsistent())
         this->makeConsistent();
+    cout<<"Result : " <<isBO()<<"  "<<(getBOType() == DoubleAR)<<endl;
     if(this->isBO() && this->getBOType() == DoubleAR)
     {
+        cout<<"readDoubleArray::inside"<<endl;
         Locator l = this->vPath[vPath.size()-1].loc;
         return iblob->readDoubleArray(doubleBuf, l, bufsize);
     }
@@ -374,7 +376,12 @@ int Path::setBinary(unsigned char *charBuf, uint size)
 int Path::setRefTo(Path &path, int idx)
 {
     Locator l2;
+    try{
     l2 = this->gotoBO();//makes use of special access code for reference objects
+    }catch(...)
+    {
+        cout<<endl<<"Goto error"<<endl;
+    }
     const Locator l1;
     Locator tempLoc;
     path.makeInconsistent();
@@ -386,8 +393,13 @@ int Path::setRefTo(Path &path, int idx)
         tempLoc = it->loc;
     }
 
+    try{
     l2 = iblob->insert(tempLoc, l2, idx);
-
+    }
+    catch(...)
+    {
+        cout<<"Exception in path::setref"<<endl;
+    }
 }
 
 Locator Path::gotoBO()
@@ -395,7 +407,13 @@ Locator Path::gotoBO()
     makeInconsistent();
     Locator l;
     cout<<this->strPath<<endl;
+    try{
     l = iblob->locateGlobal();
+    }
+    catch(...)
+    {
+        cout<<endl<<"ERROR locating Global"<<endl;
+    }
     if(l.getElements()==0)
     {
         l.insert(0,OBJECT_LEVEL);
@@ -405,6 +423,7 @@ Locator Path::gotoBO()
     vector<PathComponent>::iterator it = vPath.begin();
     do
     {
+        cout<<it->accessCode<<".";
         try{
             if((l.getElements() == (it->accessCode)))
             {
@@ -428,6 +447,7 @@ Locator Path::gotoBO()
         it++;
     }while(it!= vPath.end());
     it--;
+    cout<<endl<<l.getElements()<<"    "<<it->accessCode<<endl;
     if(l.getElements() < it->accessCode)
         throw "Not Present";
     return l;
@@ -469,3 +489,33 @@ bool Path::removeObj(uint idx)
 }
 
 
+int Path::set(int value)
+{
+    return this->setInt(value);
+}
+
+int Path::set(double value)
+{
+    return this->setDouble(value);
+}
+
+int Path::set(int *value, int size)
+{
+    return this->setIntArray(value, size);
+}
+
+
+int Path::set(double *value, int size)
+{
+    return this->setDoubleArray(value, size);
+}
+
+int Path::set(unsigned char *value, int size)
+{
+    return this->setBinary(value, size);
+}
+
+int Path::set(Path &path, int idx)
+{
+    return this->setRefTo(path, idx);
+}
