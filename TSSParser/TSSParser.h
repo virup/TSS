@@ -23,7 +23,7 @@ using namespace std;
 
 class TSSParser
 {
-    private:
+    public:
        struct Node
         {
             string name;                // Name of the node
@@ -33,6 +33,7 @@ class TSSParser
             bool isBO;                  // Tracks if nodes is BO
             bool isSO;
             bool isRO;
+            string pointingToType;
             bool isList;
             bool visited;               // Track if SO node has been visited
             int pos;                    // Position in the list of children
@@ -56,12 +57,34 @@ class TSSParser
                 child = NULL;
                 next = NULL;
            }
+            void setName(string name){this->name.assign(name);}
+            void setObjectType(string type){this->objectType.assign(type);}
+            void setType(Type type){this->type = type;}
+            void setBO(){this->isBO = true;}
+            void setSO(){this->isSO = true;}
+            void setRO(){this->isRO = true;}
+            void setPos(int p){this->pos = p;}
+            void setNext(Node *n){this->next = n;}
+            void setList(bool b){this->isList = b;}
+            void addChild(string s, Node *n){
+                children.insert(pair<string, Node*>(s,n));
+                n->parent = this;
+            }
+            void setPointingToType(string strtypename)
+            {
+                this->pointingToType.assign(strtypename);
+            }
         };
 
         Node *head;      // Actual data structure to store the grammar
         Node *current;
         string * grammar;
         int childCounter;
+
+        // Depth first search of grammar to check connected components
+        bool visit(Node * );
+        //return head of tree
+        Node *checkTreeAndReturnHead(map<string, Node*>);
         //this vector will store RO objects encountered during parsing
         vector<string> ROObjects; 
         //this vector will store RO pointers (*pointer) encountered during parsing

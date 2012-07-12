@@ -242,6 +242,8 @@ int Path::readDoubleArray(double *doubleBuf, uint bufsize)
     {
         cout<<"readDoubleArray::inside"<<endl;
         Locator l = this->vPath[vPath.size()-1].loc;
+        l.debug();
+        cout<<"Locator index = "<<vPath.size()-1<<endl;
         return iblob->readDoubleArray(doubleBuf, l, bufsize);
     }
     else
@@ -342,15 +344,16 @@ int Path::setDoubleArray(double *doubleBuf, uint size)
 {
     Locator l;
     try{
-        l = gotoBO();
+        gotoBO();
     }
     catch(...)
     {
         return 0;
     }
     PathComponent *p = &vPath[vPath.size()-1];
-    l = iblob->insertDoubleArray(doubleBuf, size, l,p->accessCode);
-    p->loc = l;
+    l = vPath[vPath.size()-2].loc;
+    cout<<"Access code ="<<p->accessCode<<endl;
+    p->loc = iblob->insertDoubleArray(doubleBuf, size, l, p->accessCode);
     this->consistent =  true;
     return 1;
 }
@@ -423,7 +426,7 @@ Locator Path::gotoBO()
     vector<PathComponent>::iterator it = vPath.begin();
     do
     {
-        cout<<it->accessCode<<".";
+        cout<<it->label<<".";
         try{
             if((l.getElements() == (it->accessCode)))
             {
@@ -438,8 +441,8 @@ Locator Path::gotoBO()
         }
         catch(...)
         {
-            cout<<"Path::gotoBO - Discontinuity detected"<<endl;
-            // cout << "fail idx = " << temp << endl;
+            cerr<<"Path::gotoBO - Discontinuity detected"<<endl;
+            //cerr << "fail idx = " << temp << endl;
 
             throw "discontinuity";
         }

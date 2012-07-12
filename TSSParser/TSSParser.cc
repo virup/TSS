@@ -9,6 +9,21 @@
 #include <sstream>
 using namespace std;
 
+
+void visitTree(TSSParser::Node *head)
+{
+    if(head->parent)
+        cout<<" Parent = "<<head->parent->name<<"  ";
+    cout<<"Self = "<<head->name<<"  "<<head->type<<endl;
+    if(head->children.size()!= 0)
+    {
+        map<string, TSSParser::Node *>::iterator it = head->children.begin();
+        for(; it != head->children.end(); it++)
+            visitTree(it->second);
+    }
+    cout<<endl;
+}
+
 TSSParser::TSSParser() {
     childCounter = 0;
     head = NULL;
@@ -30,6 +45,7 @@ TSSParser::TSSParser(string grammar, bool isFile) {
     head = NULL;
     validateGrammar_1();
     //buildTree_1(*this->grammar);
+    visitTree(head);
 }
 
 TSSParser::~TSSParser() {
@@ -41,53 +57,309 @@ TSSParser::~TSSParser() {
 }
 
 
+bool onlySpaces(std::string& str)
+{
+    for(uint i = 0; i < str.length(); i++)
+        if(str[i] != ' ')
+            return false;
+
+    return true;
+}
+
+
+string removeChars(string& str, char avoidChars[])
+{
+    for (unsigned int i = 0; i < sizeof(avoidChars); ++i)
+    {
+        str.erase (std::remove(str.begin(), str.end(), avoidChars[i]),
+                str.end());
+    }
+    return str;
+}
+
+string removeBraces(string &str)
+{
+    char avoidChars[] = "{}";
+    return removeChars(str,avoidChars);
+}
+
+string removePlus(string str)
+{
+    char avoidChars[] = "+";
+    string checkstr(str);
+    return removeChars(checkstr,avoidChars);
+}
+
+
+string removeWhitespaces(string str)
+{
+    char avoidChars[] = " ";
+    return removeChars(str,avoidChars);
+
+}
+
+
+bool checkChars(char s, string avoidChars)
+{
+    const char *p = avoidChars.c_str();
+    for(uint i = 0; i < avoidChars.length(); i++)
+        if(s == *(p+i))
+            return true;
+
+    return false;
+}
+
+void ltrim(string& s)
+{
+    int start = 0;
+    for(uint i = 0; checkChars(s[i], ": ;{}"); ++i,start=i)
+        ;
+
+    s.assign(s.substr(start));
+
+}
+
+
+void rtrim(string& s)
+{
+    int end = s.length();
+    for(uint i = s.length()-1; checkChars(s[i], ": ;{}"); i--)
+        end = i;
+
+
+    s.assign(s.substr(0, end));
+}
+
+string trimplus(string s)
+{
+    int end = s.length();
+    for(uint i = s.length()-1; checkChars(s[i], "+"); i--)
+        end = i;
+
+
+    return (s.substr(0, end));
+
+}
+
+
+
+string trimsides(string& s)
+{
+    ltrim(s);
+    rtrim(s);
+    return s;
+
+}
+
 vector<string> TSSParser::tokenize(string s, string separator)
 {
     std::stringstream ss(s);
     vector<std::string> elems;
     std::string item;
     while(std::getline(ss, item, *separator.c_str())) {
-        elems.push_back(item);
+        if(!onlySpaces(item)){
+            trimsides(item);
+            elems.push_back(item);
+        }
     }
     return elems;
 }
 
 
-string trim(string& str)
+string trim(string &str)
 {
-    char avoidChars[] = "& ;+=";
-    for (unsigned int i = 0; i < sizeof(avoidChars); ++i)
-    {
-        str.erase (std::remove(str.begin(), str.end(), avoidChars[i]),
-                str.end());
-    }
-    cout<<"Trim : "<<str<<endl;
-
-    return str;
-
+    char avoidChars[] = "& ;=";
+    return removeChars(str,avoidChars);
 }
+
+
 bool isInside(vector<string> list, string word)
 {
-    cout<<"Searching for "<<word<<endl;
-    string w = trim(word);
-    for(int i = 0; i < list.size(); i++)
-        if(trim(list[i]).compare(w))
+    for(uint i = 0; i < list.size(); i++)
+        if(trim(list[i]).compare((trimplus(word)))==0)
             return true;
 
-    cout<<"False"<<endl;
     return false;
 }
 
+bool checkAllBO(vector<string>& bo)
+{
+    vector<string> tagList;
+    tagList.push_back("I");
+    tagList.push_back("D");
+    tagList.push_back("IA");
+    tagList.push_back("DA");
+    tagList.push_back("B");
+    tagList.push_back("S");
 
+    for(uint i = 0 ; i < bo.size();i++)
+    {
+        string tag = bo[i].substr(bo[i].find(":")+1,string::npos);
+        if(!isInside(tagList,tag))
+        {
+            cerr<<"Wrong tags in "<<bo[i];
+            throw "Wrong tag in ";
+        }
+
+    }
+    return true;
+}
+
+
+bool reorderStatements(vector<string>& statements)
+{
+   vector<string> declarations;
+
+    for(uint i = 0; i < statements.size(); )
+    {
+        if(statements[i].find("{") != string::npos)
+        {
+            declarations.push_back(statements[i]);
+            statements.erase(statements.begin() + i);
+        }
+        else
+            i++;
+    }
+
+    if(declarations.size() != 3)
+    {
+        cerr<<"Not all required statements declared"<<endl;
+        throw "Not all required statements declared";
+    }
+    else
+    {
+        statements.insert(statements.begin(), declarations.begin(), declarations.end());
+    }
+}
+
+
+
+Type getType(string s)
+{
+    string type = s.substr(s.find(":")+1, string::npos);
+    cout<<"s = "<<s<<"  Type = "<< type<<endl;
+
+    if(type.compare("I"))
+        cout<<"INT"<<endl;
+
+    if(type.compare("IA"))
+        cout<<"INT ARR";
+
+    if(type.compare("D"))
+        cout<<"Double";
+
+    if(type.compare("DA"))
+        cout<<"DOUBLE ARR";
+
+    if(type.compare("S"))
+        cout<<"STRING";
+
+    if(type.compare("B"))
+        cout<<"BYTE";
+
+    if(type.compare("I")==0)
+        return Int;
+
+    if(type.compare("IA")==0)
+        return IntAR;
+
+    if(type.compare("D")==0)
+        return Double;
+
+    if(type.compare("DA")==0)
+        return DoubleAR;
+
+    if(type.compare("S")==0)
+        return String;
+
+    if(type.compare("B")==0)
+        return Byte;
+
+    return Undefined;
+
+}
+
+
+bool isList(string s)
+{
+    return (s.find("+") == s.length()-1)? true: false;
+}
+
+
+bool TSSParser::visit(TSSParser::Node *n)
+{
+    if(n->visited)
+        return true;
+    else{
+        n->visited = true;
+        for(map<string, Node *>::iterator it = n->children.begin();
+                it != n->children.end(); it++)
+            visit(it->second);
+    }
+
+}
+
+
+TSSParser::Node * TSSParser::checkTreeAndReturnHead(map<string, TSSParser::Node*> nodeMaps)
+{
+   TSSParser::Node *head = NULL;
+   map<string, TSSParser::Node *>::iterator it;
+   int parentMissing = 0;
+   for(it = nodeMaps.begin(); it != nodeMaps.end(); it++)
+       if(it->second->parent == NULL && it->second->isBO != true)
+       {
+           parentMissing++;
+           head = it->second;
+        }
+
+   if(parentMissing != 1)
+   {
+        cerr<<"Error in creating tree. Please check hierarchy"<<endl;
+        throw "Error in creating tree. Please check hierarchy";
+   }
+
+    // depth first search to check all components connected
+   this->visit(head);
+   for(it = nodeMaps.begin(); it != nodeMaps.end(); it++)
+       if(!it->second->visited)
+       {
+            cerr<<"Hierarchy not well formed"<<endl;
+            throw "Hierarchy not well formed";
+       }
+
+   return head;
+}
+
+
+void printlist(vector<string> l)
+{
+    cout<<"================="<<endl;
+    for(uint i = 0; i < l.size(); i++)
+        cout<<l[i]<<endl;
+    cout<<"================="<<endl;
+
+}
+
+
+//string removePlus(string s)
+//{
+//    return s.substr(0,s.find("+")-1);
+//}
+//
 bool TSSParser::validateGrammar_1(){
     vector<string> statements = tokenize(*this->grammar, ";");
     vector<string> so;
     vector<string> ro;
     vector<string> bo;
-    //map<TSSParser::Node> nodeMaps;
-    for(int i = 0; i < statements.size(); i++)
+
+
+    reorderStatements(statements);
+
+    map<string, TSSParser::Node*> nodeMaps;
+    map<string, TSSParser::Node*> boMaps;
+
+    for(uint i = 0; i < statements.size(); i++)
     {
-        cout<<endl<<endl<<statements[i]<<endl<<endl;
         if(statements[i].find("{") != string::npos)
         {
             vector<string> set = tokenize(statements[i], "=");
@@ -98,38 +370,54 @@ bool TSSParser::validateGrammar_1(){
             }
             else
             {
-                vector<string> setmidend = tokenize(set[1], "{");
-                vector<string> setmid = tokenize(setmidend[1],"}");
-                if(setmid.size() == 0)
-                {
-                    cerr<<"Error in statement "<<statements[i]<<endl;
-                    throw "Error in statement";
-                }
-                vector<string> names = tokenize(setmid[0], ",");
+                string nameList = removeBraces(set[1]);
+
+                vector<string> names = tokenize(nameList, ",");
                 if(set[0].find("S") != string::npos)
                 {
                     so.insert(so.begin(), names.begin(), names.end());
-                    // Trim each word
-                    // Check all the so items
+                    for(uint lv = 0; lv < so.size(); lv++)
+                    {
+                        Node *n = new Node;
+                        n->setName(so[lv]);
+                        n->setObjectType("SO");
+                        n->setType(Undefined);
+                        n->setSO();
+                        nodeMaps.insert(pair<string, Node *>(trimsides(so[lv]), n));
+                    }
                 }
                 else if(set[0].find("R") != string::npos)
                 {
-                    cout<<names[0]<<endl;
                     ro.insert(ro.begin(), names.begin(), names.end());
-                    //trim each word
-                    // Check all the ro items
+                    for(uint lv = 0; lv < ro.size(); lv++)
+                    {
+                        Node *n = new Node;
+                        n->setName(ro[lv]);
+                        n->setObjectType("SO");
+                        n->setRO();
+                        n->setType(Undefined);
+                        nodeMaps.insert(pair<string, Node *>(ro[lv], n));
+                    }
                 }
                 else if(set[0].find("B") != string::npos)
                 {
                     bo.insert(bo.begin(), names.begin(), names.end());
-                    // trim each word
-                    // Check all the bo items
+                    checkAllBO(bo);
+                    for(uint lv = 0; lv < bo.size();  lv++)
+                    {
+                        Node *n = new Node;
+                        n->setName(bo[lv].substr(0,bo[lv].find(":")));
+                        n->setObjectType("BO");
+                        n->setBO();
+                        n->setType(getType(bo[lv]));
+                        bo[lv].assign(bo[lv].substr(0, bo[lv].find(":")));
+                        boMaps.insert(pair<string, Node *>(bo[lv].substr(0,bo[lv].find(":")), n));
+                    }
                 }
             }
         }
         else // normal statment
         {
-            cout<<"Normal statement"<<endl;
             string statement = statements[i];
             size_t pos = statement.find("::=");
             if(pos == string::npos)
@@ -139,14 +427,19 @@ bool TSSParser::validateGrammar_1(){
             }
             string RHS = statement.substr(pos + 3 );
             string LHS = statement.substr(0,pos);
+            LHS = trim(LHS);
             vector<string> RHSs = tokenize(RHS, " ");
-            cout<<"::: LHS = "<<LHS<<endl;
+            Node *earlierChild = NULL;
             if(isInside(so,LHS)) // LHS == SO
             {
-                for(int j= 0; j < RHSs.size(); j++)
+                Node *nLHS = nodeMaps[trimsides(LHS)];
+                earlierChild = NULL;
+
+                for(uint j= 0; j < RHSs.size(); j++)
                 {
-                    cout<<"Checking "<<RHSs[j]<<endl;
-                    if(!isInside(so,RHSs[j]) && !isInside(ro,RHSs[j]) && !isInside(bo, RHSs[j]))
+
+                    string curedString(RHSs[j].substr(0, RHSs[j].find(":")));
+                    if(!isInside(so,curedString) && !isInside(ro,curedString) && !isInside(bo, curedString))
                     {
                         cerr<<RHSs[j]<<"Not found in "<<statements[i]<<endl;
                         throw "Error in statements";
@@ -156,11 +449,43 @@ bool TSSParser::validateGrammar_1(){
                         cerr<<RHSs[j]<<"is recursive in "<<statements[i]<<endl;
                         throw "Error in statements";
                     }
+
+                    // create the tree
+
+                    if(isInside(bo, curedString))
+                    {
+                        string s(trimplus(RHSs[j]));
+                        s.assign(s.substr(0,s.find(":")));
+                        Node * n = boMaps.find(s)->second;
+                        Node *newNode = new Node();
+                        newNode->setName(n->name);
+                        newNode->setObjectType(n->objectType);
+                        newNode->setBO();
+                        newNode->setType(n->type);
+                        newNode->setPos(j);
+                        newNode->setList(::isList(RHSs[j]));
+                        if(earlierChild!=NULL)
+                        {
+                            cout<<"Earlier child not NULL"<<endl;
+                            earlierChild->setNext(newNode);
+                        }
+
+                        nLHS->addChild(trimsides(curedString),newNode);
+                    }
+                    else
+                    {
+                        Node * n = nodeMaps.find(trimplus(RHSs[j]))->second;
+                        n->setPos(j);
+                        n->setList(::isList(RHSs[j]));
+                        if(earlierChild!=NULL)
+                            earlierChild->setNext(n);
+                        nLHS->addChild(trimplus(RHSs[j]),n);
+                    }
                 }
             }
             else if(isInside(ro, LHS)) //LHS == RO
             {
-                cout<<"REFERENCE OBJECT : "<<RHSs[0]<<endl;
+
                 if(RHSs.size() > 1)
                 {
                     cerr<<"RO should point to only one object "<<statements[i]<<endl;
@@ -171,18 +496,25 @@ bool TSSParser::validateGrammar_1(){
                     cerr<<"Expected &SO or &RO in the right hand side of  "<<statements[i]<<endl;
                     throw "Error in statement";
                 }
-                if(!isInside(so,RHSs[0]) && !isInside(bo, RHSs[0]))
+
+                string curedString(RHSs[0].substr(0, RHSs[0].find(":")));
+                curedString.assign(trimplus(curedString.substr(1)));
+                if(!isInside(so,curedString) && !isInside(bo, curedString))
                 {
                     cerr<<RHSs[0]<<" not in S set or B set in "<<statements[i]<<endl;
                     throw "Error in statement";
                 }
+                    Node * n = nodeMaps.find(LHS)->second;
+                    n->setObjectType(curedString);
             }
-        else{
-            cerr<<LHS<< " not in S set or R set in "<<statements[i]<<endl;
-            throw "Error in statement";
-        }
+            else
+            {
+                cerr<<LHS<< " not in S set or R set in "<<statements[i]<<endl;
+                throw "Error in statement";
+            }
         }
     }
+    head = checkTreeAndReturnHead(nodeMaps);
 }
 
 bool TSSParser::validateGrammar() {
@@ -214,10 +546,10 @@ bool TSSParser::validateGrammar() {
     //print();
     cout << "Building done\n";
 
-    for (int i = 0; i < ROPointers.size(); i++) {
+    for (uint i = 0; i < ROPointers.size(); i++) {
         cout << "Pointer(" << i << ") --> " << ROPointers.at(i) << endl;
     }
-    for (int i = 0; i < ROObjects.size(); i++) {
+    for (uint i = 0; i < ROObjects.size(); i++) {
         cout << "Object(" << i << ") --> " << ROObjects.at(i) << endl;
     }
 
@@ -225,7 +557,6 @@ bool TSSParser::validateGrammar() {
     cout << "Linking done\n";
     // print();
     return true && matchRO();
-
 }
 
 void TSSParser::buildTree(string &str) {
@@ -270,7 +601,7 @@ void TSSParser::buildTree(string &str) {
             ROPointers.push_back(temp);
         }
 
-        //check if we have ; at the end 
+        //check if we have ; at the end
         if (str.at(str.size() - 1) == ';') {
             //cout << "Storing: " << head->name << endl;
             Node * myHead = new Node;
@@ -416,6 +747,7 @@ void TSSParser::linkTrees() {
         bool found = false;
         int i = 0;
         while (i < nodes.size()) {
+
             //cout << "Current name= " << current->name << ":: Front: " << nodes.front()->name << endl;
             if (current->name.compare(nodes.front()->name) == 0 && nodes.front()->isSO) {
                 // cout << "Match found\n";
@@ -459,22 +791,43 @@ void TSSParser::linkTrees() {
 
 }
 
+
+void printChildren(map<string, TSSParser::Node *> maplist)
+{
+    map<string, TSSParser::Node *>:: iterator it;
+    cout<<"Children are: "<<endl;
+    for(it = maplist.begin(); it!= maplist.end(); it++)
+    {
+        cout<<it->first<<endl;
+    }
+
+}
+
+
 bool TSSParser::storeAccessCode(string strpath, vector<PathComponent>& pathVector) {
     //first step is tokenize the path string. The format of such string will be as follow
     //objectName.objectName[index].objectName[index].objectName
     //where objectName is of type string, and index will be some number. If we find a number, 
     //we simply ignore it.
+    cout<<strpath<<endl;
     bool returnVal = true;
     char * tmp;
     string * str;
     PathComponent pathComp;
-    char *path = new char[strpath.length()];
+    char *path = new char[strpath.length() + 1 ];
     strpath.copy(path,strpath.length());
+    path[strpath.length()] = 0 ;
     tmp = strtok((char*) path, ".[]");
     while (tmp != NULL) {
         str = new string(tmp);
         if (!isdigit(str->at(0))) {
             pathComp.label = *str;
+            pathVector.push_back(pathComp);
+        }
+        else
+        {
+            pathComp.label.assign("List");
+            pathComp.accessCode = atoi(str->c_str());
             pathVector.push_back(pathComp);
         }
         tmp = strtok(NULL, ".[]");
@@ -488,6 +841,8 @@ bool TSSParser::storeAccessCode(string strpath, vector<PathComponent>& pathVecto
         pathVector.at(0).accessCode = 0;
         for (int i = 1; i < pathVector.size(); i++) {
             //get next child
+            if(pathVector[i].label.compare("List") == 0) continue;
+            
             if (current->children.find(pathVector.at(i).label) != current->children.end()) {
                 current = current->children.at(pathVector.at(i).label);
                 pathVector.at(i).accessCode = current->pos;
@@ -517,6 +872,7 @@ bool TSSParser::isBO(Path *p) {
     Node * current = head;
     if (p->vPath.at(0).label.compare(head->name) == 0) {
         for (int i = 1; i < p->vPath.size(); i++) {
+            if(p->vPath[i].label.compare("List") == 0) continue;
             if (current->children.find(p->vPath.at(i).label) != current->children.end()) {
                 current = current->children.at(p->vPath.at(i).label);
             } else {
@@ -546,6 +902,7 @@ bool TSSParser::isSO(Path *p) {
     Node * current = head;
     if (p->vPath.at(0).label.compare(head->name) == 0) {
         for (int i = 1; i < p->vPath.size(); i++) {
+            if(p->vPath[i].label.compare("List") == 0) continue;
             if (current->children.find(p->vPath.at(i).label) != current->children.end()) {
                 current = current->children.at(p->vPath.at(i).label);
             } else {
@@ -575,6 +932,7 @@ bool TSSParser::isList(Path *p) {
     Node * current = head;
     if (p->vPath.at(0).label.compare(head->name) == 0) {
         for (int i = 1; i < p->vPath.size(); i++) {
+            if(p->vPath[i].label.compare("List") == 0) continue;
             if (current->children.find(p->vPath.at(i).label) != current->children.end()) {
                 current = current->children.at(p->vPath.at(i).label);
             } else {
@@ -604,6 +962,7 @@ bool TSSParser::isRef(Path *p) {
     Node * current = head;
     if (p->vPath.at(0).label.compare(head->name) == 0) {
         for (int i = 1; i < p->vPath.size(); i++) {
+            if(p->vPath[i].label.compare("List") == 0) continue;
             if (current->children.find(p->vPath.at(i).label) != current->children.end()) {
                 current = current->children.at(p->vPath.at(i).label);
             } else {
@@ -632,6 +991,7 @@ Type TSSParser::getBOType(Path *p) {
     Node * current = head;
     if (p->vPath.at(0).label.compare(head->name) == 0) {
         for (int i = 1; i < p->vPath.size(); i++) {
+            if(p->vPath[i].label.compare("List") == 0) continue;
             if (current->children.find(p->vPath.at(i).label) != current->children.end()) {
                 current = current->children.at(p->vPath.at(i).label);
             } else {
@@ -686,7 +1046,7 @@ bool TSSParser :: matchRO() {
     bool found = false;
     if(pointerSize != objectSize) {
         cout << "Either pointer to RO Object is missing OR RO object is undefined\n ";
-        return false;               
+        return false;
     }else {
         for(int i = 0; i < pointerSize; i++) {
             for (int j = 0; j < objectSize; j++) {
