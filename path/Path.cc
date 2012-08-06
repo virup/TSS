@@ -105,7 +105,7 @@ Path::Path(string strpath, TSSParser *tp, iBlob *iblob)
     this->iblob = iblob;
     this->consistent = false;
     if(!this->tp->storeAccessCode(strpath, this->vPath))
-        cout<<endl<<"FALSE";
+        cerr<<endl<<"FALSE";
     //PopulateLocators();
 }
 
@@ -114,14 +114,14 @@ int Path::PopulateLocators()
 {
     try{
         // Get the global locator
-        Locator gLocator = iblob->locateGlobal();
+        Locator tempLocator = iblob->locateGlobal();
         // The tempLocator will finally contain a locator to the object
-        Locator tempLocator = gLocator;
         for(vector<PathComponent>::iterator it = vPath.begin(); it!= vPath.end(); it++)
         {
             if(tempLocator.getElements() < it->accessCode)
             {
                 consistent = false;
+                throw 0;
                 return 0;
             }
             tempLocator = iblob->locate(tempLocator, (*it).accessCode);
@@ -132,7 +132,7 @@ int Path::PopulateLocators()
     }
     catch(...)
     {
-        cout<<"Cannot make the path consistent"<<endl;
+        cerr<<"Cannot make the path consistent"<<endl;
         consistent = false;
         return 0;
     }
@@ -169,7 +169,6 @@ string Path::readString()
     unsigned char strLengthArray[10];
     if(this->isBO() && this->getBOType() == String)
     {
-        cout<<"Reading base object"<<endl;
         Locator l = this->vPath[vPath.size()-1].loc;
         if(iblob->readChars(strLengthArray, l, 10))
         {
@@ -181,14 +180,14 @@ string Path::readString()
         }
         else
         {
-            cout<<"exception happens while reading string "<<endl;
+            cerr<<"exception happens while reading string "<<endl;
             string str(" ");
             return str;
         }
     }
     else
     {
-        cout<<"Not reading base object "<<endl;
+        cerr<<"Not reading base object "<<endl;
         string str(" "); //Should actually throw an exception here
         return str;
     }
@@ -237,13 +236,10 @@ int Path::readDoubleArray(double *doubleBuf, uint bufsize)
 {
     if(!this->isConsistent())
         this->makeConsistent();
-    cout<<"Result : " <<isBO()<<"  "<<(getBOType() == DoubleAR)<<endl;
-    if(this->isBO() && this->getBOType() == DoubleAR)
+
+    if(this->isRef() || (this->isBO() && this->getBOType() == DoubleAR))
     {
-        cout<<"readDoubleArray::inside"<<endl;
         Locator l = this->vPath[vPath.size()-1].loc;
-        l.debug();
-        cout<<"Locator index = "<<vPath.size()-1<<endl;
         return iblob->readDoubleArray(doubleBuf, l, bufsize);
     }
     else
@@ -344,16 +340,16 @@ int Path::setDoubleArray(double *doubleBuf, uint size)
 {
     Locator l;
     try{
-        gotoBO();
+        l = gotoBO();
     }
     catch(...)
     {
         return 0;
     }
-    PathComponent *p = &vPath[vPath.size()-1];
-    l = vPath[vPath.size()-2].loc;
-    cout<<"Access code ="<<p->accessCode<<endl;
-    p->loc = iblob->insertDoubleArray(doubleBuf, size, l, p->accessCode);
+    //l = vPath[vPath.size()-2].loc;
+    try{
+    vPath[vPath.size()-1].loc = iblob->insertDoubleArray(doubleBuf, size, l, vPath[vPath.size()-1].accessCode);
+    }catch(...){cerr<<"Error in inserting"<<endl;}
     this->consistent =  true;
     return 1;
 }
@@ -379,11 +375,12 @@ int Path::setBinary(unsigned char *charBuf, uint size)
 int Path::setRefTo(Path &path, int idx)
 {
     Locator l2;
+
     try{
-    l2 = this->gotoBO();//makes use of special access code for reference objects
+        l2 = this->gotoBO();//makes use of special access code for reference objects
     }catch(...)
     {
-        cout<<endl<<"Goto error"<<endl;
+        cerr<<endl<<"Goto error"<<endl;
     }
     const Locator l1;
     Locator tempLoc;
@@ -397,36 +394,37 @@ int Path::setRefTo(Path &path, int idx)
     }
 
     try{
-    l2 = iblob->insert(tempLoc, l2, idx);
+        l2 = iblob->insert(tempLoc, l2, idx);
     }
     catch(...)
     {
-        cout<<"Exception in path::setref"<<endl;
+        cerr<<"Exception in path::setref"<<endl;
     }
+    vPath[vPath.size() -1 ].loc = l2;
+    return 1 ;
 }
 
 Locator Path::gotoBO()
 {
     makeInconsistent();
     Locator l;
-    cout<<this->strPath<<endl;
+
     try{
-    l = iblob->locateGlobal();
+        l = iblob->locateGlobal();
     }
     catch(...)
     {
-        cout<<endl<<"ERROR locating Global"<<endl;
+        cerr<<endl<<"ERROR locating Global"<<endl;
     }
-    if(l.getElements()==0)
+    /*if(l.getElements()==0)
     {
         l.insert(0,OBJECT_LEVEL);
-        l = l.locate(0);
-    }
+        //l = l.locate(0);
+    }*/
     //int temp = -1;//delete
     vector<PathComponent>::iterator it = vPath.begin();
     do
     {
-        cout<<it->label<<".";
         try{
             if((l.getElements() == (it->accessCode)))
             {
@@ -437,7 +435,6 @@ Locator Path::gotoBO()
             {
                 l = l.locate(it->accessCode);
             }
-
         }
         catch(...)
         {
@@ -448,9 +445,8 @@ Locator Path::gotoBO()
         }
 
         it++;
-    }while(it!= vPath.end());
-    it--;
-    cout<<endl<<l.getElements()<<"    "<<it->accessCode<<endl;
+    }while(it!= vPath.end()-1);
+
     if(l.getElements() < it->accessCode)
         throw "Not Present";
     return l;

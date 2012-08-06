@@ -13,15 +13,15 @@ using namespace std;
 void visitTree(TSSParser::Node *head)
 {
     if(head->parent)
-        cout<<" Parent = "<<head->parent->name<<"  ";
-    cout<<"Self = "<<head->name<<"  "<<head->type<<endl;
+        cerr<<" Parent = "<<head->parent->name<<"  ";
+    cerr<<"Self = "<<head->name<<"  "<<head->type<<endl;
     if(head->children.size()!= 0)
     {
         map<string, TSSParser::Node *>::iterator it = head->children.begin();
         for(; it != head->children.end(); it++)
             visitTree(it->second);
     }
-    cout<<endl;
+    cerr<<endl;
 }
 
 TSSParser::TSSParser() {
@@ -44,8 +44,6 @@ TSSParser::TSSParser(string grammar, bool isFile) {
     childCounter = 0;
     head = NULL;
     validateGrammar_1();
-    //buildTree_1(*this->grammar);
-    visitTree(head);
 }
 
 TSSParser::~TSSParser() {
@@ -237,25 +235,7 @@ bool reorderStatements(vector<string>& statements)
 Type getType(string s)
 {
     string type = s.substr(s.find(":")+1, string::npos);
-    cout<<"s = "<<s<<"  Type = "<< type<<endl;
 
-    if(type.compare("I"))
-        cout<<"INT"<<endl;
-
-    if(type.compare("IA"))
-        cout<<"INT ARR";
-
-    if(type.compare("D"))
-        cout<<"Double";
-
-    if(type.compare("DA"))
-        cout<<"DOUBLE ARR";
-
-    if(type.compare("S"))
-        cout<<"STRING";
-
-    if(type.compare("B"))
-        cout<<"BYTE";
 
     if(type.compare("I")==0)
         return Int;
@@ -466,7 +446,7 @@ bool TSSParser::validateGrammar_1(){
                         newNode->setList(::isList(RHSs[j]));
                         if(earlierChild!=NULL)
                         {
-                            cout<<"Earlier child not NULL"<<endl;
+                            cerr<<"Earlier child not NULL"<<endl;
                             earlierChild->setNext(newNode);
                         }
 
@@ -521,10 +501,10 @@ bool TSSParser::validateGrammar() {
     //first check if syntax is correct
     Scanner scanner(*grammar);
     if (!scanner.scan()) {
-        cout << "Grammar has syntax errors\n";
+        cerr << "Grammar has syntax errors\n";
         return false;
     } else {
-        cout << "Building individual tree\n";
+        cerr << "Building individual tree\n";
         //check semantics while building tree
         char * grammarC = new char[grammar->size() + 1];
         grammarC[grammar->size()] = 0;
@@ -544,7 +524,6 @@ bool TSSParser::validateGrammar() {
     }
     //cout << "vector size: " << nodes.size() << endl;
     //print();
-    cout << "Building done\n";
 
     for (uint i = 0; i < ROPointers.size(); i++) {
         cout << "Pointer(" << i << ") --> " << ROPointers.at(i) << endl;
@@ -809,7 +788,6 @@ bool TSSParser::storeAccessCode(string strpath, vector<PathComponent>& pathVecto
     //objectName.objectName[index].objectName[index].objectName
     //where objectName is of type string, and index will be some number. If we find a number, 
     //we simply ignore it.
-    cout<<strpath<<endl;
     bool returnVal = true;
     char * tmp;
     string * str;
@@ -818,6 +796,11 @@ bool TSSParser::storeAccessCode(string strpath, vector<PathComponent>& pathVecto
     strpath.copy(path,strpath.length());
     path[strpath.length()] = 0 ;
     tmp = strtok((char*) path, ".[]");
+
+    //Store the first component : GLOBAL
+    pathComp.label = "GLOBAL";
+    pathComp.accessCode = 0;
+
     while (tmp != NULL) {
         str = new string(tmp);
         if (!isdigit(str->at(0))) {
@@ -836,25 +819,24 @@ bool TSSParser::storeAccessCode(string strpath, vector<PathComponent>& pathVecto
     Node * current = this->head;
     //now we have the path stored in vector. Traverse the tree with this path and store the
     //access code in the pathVector
-    //cout<<"storeAccessCode   "<<pathVector.at(0).label<<endl;
     if (head->name.compare(pathVector.at(0).label) == 0) {
         pathVector.at(0).accessCode = 0;
         for (int i = 1; i < pathVector.size(); i++) {
             //get next child
             if(pathVector[i].label.compare("List") == 0) continue;
-            
+
             if (current->children.find(pathVector.at(i).label) != current->children.end()) {
                 current = current->children.at(pathVector.at(i).label);
                 pathVector.at(i).accessCode = current->pos;
             } else {
-                cout << pathVector.at(i).label << " is not a valid path\n";
+                cerr << pathVector.at(i).label << " is not a valid path\n";
                 returnVal = false;
                 break;
             }
 
         }
     } else {
-        cout << "Path is invalid\n";
+        cerr << "Path is invalid\n";
         returnVal = false;
     }
     return returnVal;
@@ -876,14 +858,14 @@ bool TSSParser::isBO(Path *p) {
             if (current->children.find(p->vPath.at(i).label) != current->children.end()) {
                 current = current->children.at(p->vPath.at(i).label);
             } else {
-                cout << p->vPath.at(i).label << " is not a valid path\n";
+                cerr << p->vPath.at(i).label << " is not a valid path\n";
                 retVal = false;
                 break;
             }
         }
     } else {
         retVal = false;
-        cout << "Path is invalid\n";
+        cerr << "Path is invalid\n";
     }
 
     if (retVal) {
@@ -906,14 +888,14 @@ bool TSSParser::isSO(Path *p) {
             if (current->children.find(p->vPath.at(i).label) != current->children.end()) {
                 current = current->children.at(p->vPath.at(i).label);
             } else {
-                cout << p->vPath.at(i).label << " is not a valid path\n";
+                cerr << p->vPath.at(i).label << " is not a valid path\n";
                 retVal = false;
                 break;
             }
         }
     } else {
         retVal = false;
-        cout << "Path is invalid\n";
+        cerr << "Path is invalid\n";
     }
 
     if (retVal) {
@@ -936,14 +918,14 @@ bool TSSParser::isList(Path *p) {
             if (current->children.find(p->vPath.at(i).label) != current->children.end()) {
                 current = current->children.at(p->vPath.at(i).label);
             } else {
-                cout << p->vPath.at(i).label << " is not a valid path\n";
+                cerr << p->vPath.at(i).label << " is not a valid path\n";
                 retVal = false;
                 break;
             }
         }
     } else {
         retVal = false;
-        cout << "Path is invalid\n";
+        cerr << "Path is invalid\n";
     }
 
     if (retVal) {
@@ -966,14 +948,14 @@ bool TSSParser::isRef(Path *p) {
             if (current->children.find(p->vPath.at(i).label) != current->children.end()) {
                 current = current->children.at(p->vPath.at(i).label);
             } else {
-                cout << p->vPath.at(i).label << " is not a valid path\n";
+                cerr << p->vPath.at(i).label << " is not a valid path\n";
                 retVal = false;
                 break;
             }
         }
     } else {
         retVal = false;
-        cout << "Path is invalid\n";
+        cerr << "Path is invalid\n";
     }
 
     if (retVal) {
@@ -995,26 +977,26 @@ Type TSSParser::getBOType(Path *p) {
             if (current->children.find(p->vPath.at(i).label) != current->children.end()) {
                 current = current->children.at(p->vPath.at(i).label);
             } else {
-                cout << p->vPath.at(i).label << " is not a valid path\n";
+                cerr << p->vPath.at(i).label << " is not a valid path\n";
                 return Undefined;
             }
         }
     } else {
-        cout << "Path is invalid\n";
+        cerr << "Path is invalid\n";
         return Undefined;
     }
 
     if (current->isBO)
         return current->type;
     else {
-        cout << "Object is not BO\n";
+        cerr << "Object is not BO\n";
         return Undefined;
     }
 
 }
 
 void TSSParser::print() {
-    cout << "Printing\n";
+    cerr << "Printing\n";
     queue <Node*> printQueue;
 
     printQueue.push(head);
@@ -1022,13 +1004,13 @@ void TSSParser::print() {
     while (!printQueue.empty()) {
         Node * temp = printQueue.front();
         int size = temp->children.size();
-        cout << "\nParent: " << temp->name << " :: children: " << size << endl;
+        cerr << "\nParent: " << temp->name << " :: children: " << size << endl;
 
         //push children
         temp = temp->child;
 
         for (int i = 0; i < size; i++) {
-            cout << "\tChild(" << i << "): " << temp->parent->children.at(temp->name)->name << endl;
+            cerr << "\tChild(" << i << "): " << temp->parent->children.at(temp->name)->name << endl;
             if (temp->isSO)
                 printQueue.push(temp->parent->children.at(temp->name));
             temp = temp->next;
@@ -1045,7 +1027,7 @@ bool TSSParser :: matchRO() {
     int objectSize = ROObjects.size();
     bool found = false;
     if(pointerSize != objectSize) {
-        cout << "Either pointer to RO Object is missing OR RO object is undefined\n ";
+        cerr << "Either pointer to RO Object is missing OR RO object is undefined\n ";
         return false;
     }else {
         for(int i = 0; i < pointerSize; i++) {
@@ -1057,7 +1039,7 @@ bool TSSParser :: matchRO() {
             }
 
             if(!found) {
-                cout << "RO Object or RO pointer not found\n";
+                cerr << "RO Object or RO pointer not found\n";
                 return false;
             }
 

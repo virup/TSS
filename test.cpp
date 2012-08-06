@@ -531,6 +531,8 @@ int main(int argc, char* argv[])
     Path pface1OSeg1 = pface1O + "segment[1]";
     Path pface1OSeg2 = pface1O + "segment[2]";
 
+    //Reference path
+    Path pindex = t.createPath("region.index[0]");
 
     cout<<"Paths constructed"<<endl;
 
@@ -538,21 +540,20 @@ int main(int argc, char* argv[])
     // WRITE VALUES TO THE PATHS
     try{
         cout<<pface0OSeg0.set(f0OSeg0,sizeof(f0OSeg0));
-//        cout<<pface0OSeg1.set(f0OSeg1,sizeof(f0OSeg1));
-//        cout<<pface0OSeg2.set(f0OSeg2,sizeof(f0OSeg2));
-//        cout<<pface0OSeg3.set(f0OSeg3,sizeof(f0OSeg3));
-//
-//        cout<<pface0HSeg0.set(f0HSeg0,sizeof(f0HSeg0));
-//        cout<<pface0HSeg1.set(f0HSeg1,sizeof(f0HSeg1));
-//        cout<<pface0HSeg2.set(f0HSeg2,sizeof(f0HSeg2));
-//
-//        cout<<pface1OSeg0.set(f1OSeg0,sizeof(f1OSeg0));
-//        cout<<pface1OSeg1.set(f1OSeg1,sizeof(f1OSeg1));
-//        cout<<pface1OSeg2.set(f1OSeg2,sizeof(f1OSeg2));
-//
-//        cout<<endl<<"Writing the pointer"<<endl;
-//        Path pindex = t.createPath("region.index[0]");
-//        t.setRef(pface0OSeg1, pindex, 0);
+        cout<<pface0OSeg1.set(f0OSeg1,sizeof(f0OSeg1));
+        cout<<pface0OSeg2.set(f0OSeg2,sizeof(f0OSeg2));
+        cout<<pface0OSeg3.set(f0OSeg3,sizeof(f0OSeg3));
+
+        cout<<pface0HSeg0.set(f0HSeg0,sizeof(f0HSeg0));
+        cout<<pface0HSeg1.set(f0HSeg1,sizeof(f0HSeg1));
+        cout<<pface0HSeg2.set(f0HSeg2,sizeof(f0HSeg2));
+
+        cout<<pface1OSeg0.set(f1OSeg0,sizeof(f1OSeg0));
+        cout<<pface1OSeg1.set(f1OSeg1,sizeof(f1OSeg1));
+        cout<<pface1OSeg2.set(f1OSeg2,sizeof(f1OSeg2));
+
+        cout<<endl<<"Writing the pointer"<<endl;
+        cout<<pindex.setRefTo(pface0OSeg0, 0);
     }
     catch(...)
     {
@@ -562,11 +563,14 @@ int main(int argc, char* argv[])
     cout<<endl<<"Reading back"<<endl;
     double p[4];
 
-    Path pp = t.createPath("region.face[0].outerCycle.segment[0]");
+    Path pp1 = t.createPath("region.face[0].outerCycle.segment[0]");
+    Path pp2 = t.createPath("region.face[0].outerCycle.segment[1]");
+    Path pp3 = t.createPath("region.face[1].outerCycle.segment[2]");
+    Path pp4 = t.createPath("region.index[0]");
 
     // READ BACK THE VALUE FROM face[0].outerCycle.Segment[1]
     try{
-        pp.readDoubleArray(p,sizeof(p));
+        pp4.readDoubleArray(p,sizeof(p));
     	//cout << t.readString(pregionlabel);
     }
     catch(...)
