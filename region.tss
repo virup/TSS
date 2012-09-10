@@ -1,0 +1,5 @@
+region ::= vface:Face+ vindex:&Segment+;
+Face ::= vocycle:Outercycle vhcycle:Holecycle+;
+Outercycle ::= vOseg:Segment+;
+Holecycle ::= vHseg:Segment+;
+Segment ::= lpt:double+ rpt:double+;
