@@ -1,0 +1,6 @@
+*.so
+*.save.*
+*.out
+*.swp
+*.o
+*.swo
