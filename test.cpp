@@ -463,129 +463,109 @@ int main(int argc, char* argv[])
 
 
     // DECLARE A GRAMMAR FOR THE NEW DATA TYPE
-    /*char *regionGrammar =
-        "<region:SO> -= <face:SO>[]<index:RO>[];"
-        "<face:SO>   -= <outerCycle:SO><holeCycle:SO>[];"
-        "<outerCycle:SO> -= <segment:DA>[](*index);"
-        "<holeCycle:SO>  -= <segment:DA>[];";
-    */
-
-    char *regionGrammar = "S = {region, face, outerCycle, holeCycle};"
-                         "R = {index};"
-                         "B = {segment:DA};"
-                         "region ::= face index+;"
-                         "face ::= outerCycle holeCycle+;"
-                         "outerCycle ::= segment:DA+ index;"
-                         "holeCycle ::=  segment:DA+;"
-                         "index ::= &segment:DA;";
-
+    char* grammarFile = "region.tss";
 
 
     // CREATE A TSS OBJECT AND PROVIDE THE GRAMMAR
-    TSS t(regionGrammar, mylob, svchp, errhp, "Region");
-
-    //exit(0);
-	//cout << "BEGIN TSS CONSTRUCTOR" << endl;
-	//TSS t(regionGrammar, "Region");
-	//t.establishConnection(string("phoenix.cise.ufl.edu:1521/orcl"),string(username), string(password));
-
-	//TSS t(regionGrammar,string("phoenix.cise.ufl.edu:1521/orcl"),string(username), string(password), false, "Region");
-
-    cout << "DEFINE DATA SEGMENTS " << endl;
-
-    // DEFINE SOME SEGMENT DATA
-    double f0OSeg0[] = {1.0,3.0,1.5,0.5};
-    double f0OSeg1[] = {1.5,0.5,3.0,0.5};
-    double f0OSeg2[] = {3.0,0.5,3.0,2.0};
-    double f0OSeg3[] = {3.0, 2.0, 1.0,3.0};
-    double f0HSeg0[] = {2.0,1.0, 2.5,1.0};
-    double f0HSeg1[] = {2.5,1.0,2.0,2.0};
-    double f0HSeg2[] = {2.0,2.0,2.0,1.0};
-
-    double f1OSeg0[] = {5.0,1.0,7.0,1.0};
-    double f1OSeg1[] = {7.0,1.0,6.0,3.0};
-    double f1OSeg2[] = {6.0,3.0,5.0,1.0};
-
-
-    //Path testPath = t.createPath();
-    // CREATE SOME REQUIRED PATHS
-    Path pface0 = t.createPath("region.face[0]");
-    Path pface0O = pface0+"outerCycle";
-
-    Path pface0OSeg0 = pface0O + "segment[0]";
-    Path pface0OSeg1 = pface0O + "segment[1]";
-    Path pface0OSeg2 = pface0O + "segment[2]";
-    Path pface0OSeg3 = pface0O + "segment[3]";
-
-
-    Path pface0H = pface0+"holeCycle[0]";
-    Path pface0HSeg0 = pface0H + "segment[0]";
-    Path pface0HSeg1 = pface0H + "segment[1]";
-    Path pface0HSeg2 = pface0H + "segment[2]";
-
-
-
-    Path pface1 = t.createPath("region.face[1]");
-    Path pface1O = pface1+"outerCycle";
-    Path pface1OSeg0 = pface1O + "segment[0]";
-    Path pface1OSeg1 = pface1O + "segment[1]";
-    Path pface1OSeg2 = pface1O + "segment[2]";
-
-    //Reference path
-    Path pindex = t.createPath("region.index[0]");
-
-    cout<<"Paths constructed"<<endl;
-
-
-    // WRITE VALUES TO THE PATHS
     try{
-        cout<<pface0OSeg0.set(f0OSeg0,sizeof(f0OSeg0));
-        cout<<pface0OSeg1.set(f0OSeg1,sizeof(f0OSeg1));
-        cout<<pface0OSeg2.set(f0OSeg2,sizeof(f0OSeg2));
-        cout<<pface0OSeg3.set(f0OSeg3,sizeof(f0OSeg3));
+        TSS t(grammarFile, true,  mylob, svchp, errhp, "Region");
+        //exit(0);
+        //cout << "BEGIN TSS CONSTRUCTOR" << endl;
+        //TSS t(regionGrammar, "Region");
+        //t.establishConnection(string("phoenix.cise.ufl.edu:1521/orcl"),string(username), string(password));
 
-        cout<<pface0HSeg0.set(f0HSeg0,sizeof(f0HSeg0));
-        cout<<pface0HSeg1.set(f0HSeg1,sizeof(f0HSeg1));
-        cout<<pface0HSeg2.set(f0HSeg2,sizeof(f0HSeg2));
+        //TSS t(regionGrammar,string("phoenix.cise.ufl.edu:1521/orcl"),string(username), string(password), false, "Region");
 
-        cout<<pface1OSeg0.set(f1OSeg0,sizeof(f1OSeg0));
-        cout<<pface1OSeg1.set(f1OSeg1,sizeof(f1OSeg1));
-        cout<<pface1OSeg2.set(f1OSeg2,sizeof(f1OSeg2));
+        cout << "DEFINE DATA SEGMENTS " << endl;
 
-        cout<<endl<<"Writing the pointer"<<endl;
-        cout<<pindex.setRefTo(pface0OSeg0, 0);
+        // DEFINE SOME SEGMENT DATA
+        double f0OSeg0[] = {1.0,3.0,1.5,0.5};
+        double f0OSeg1[] = {1.5,0.5,3.0,0.5};
+        double f0OSeg2[] = {3.0,0.5,3.0,2.0};
+        double f0OSeg3[] = {3.0, 2.0, 1.0,3.0};
+        double f0HSeg0[] = {2.0,1.0, 2.5,1.0};
+        double f0HSeg1[] = {2.5,1.0,2.0,2.0};
+        double f0HSeg2[] = {2.0,2.0,2.0,1.0};
+
+        double f1OSeg0[] = {5.0,1.0,7.0,1.0};
+        double f1OSeg1[] = {7.0,1.0,6.0,3.0};
+        double f1OSeg2[] = {6.0,3.0,5.0,1.0};
+
+
+        //Path testPath = t.createPath();
+        // CREATE SOME REQUIRED PATHS
+        //region.vFace[0].vocycle.vOseg[0]
+        Path pface0 = t.createPath("region.vface[0]");
+        Path pface0O = pface0+"vocycle";
+        Path pface0OSeg0 = pface0O + "vOseg[0]";
+        Path pface0OSeg0lpt = pface0OSeg0 + "lpt";
+
+        Path pface0OSeg0lpt1 = pface0OSeg0lpt + "[1]";
+
+
+        Path pindex = t.createPath("region.vindex[0]");
+
+        cout<<"Paths constructed"<<endl;
+        cout<<"isList = "<<pface0OSeg0lpt.isList()<<endl;
+
+        // WRITE VALUES TO THE PATHS
+        try{
+            cout<<pface0OSeg0lpt.set(f0OSeg0,sizeof(f0OSeg0));
+            cout<<"Setting reference "<<endl;
+            cout<<pindex.set(pface0OSeg0);
+            cout<<"Setting reference done ! "<<endl;
+        }
+        catch(string s)
+        {
+            cout<<s<<endl;
+            cout<<"error";
+            return 0;
+        }
+        catch(char *s)
+        {
+            cout<<s;
+            return 0;
+        }
+
+        cout<<endl<<"Reading back"<<endl;
+        double p[4];
+
+        //     pface1OSeg2.removeObj();
+
+        // READ BACK THE VALUE FROM face[0].outerCycle.Segment[1]
+
+        try{
+            //pindex = pindex + "lpt";
+            //pindex.readDoubleArray(p,sizeof(p));
+            //cout << t.readString(pregionlabel);
+            double p = pface0OSeg0lpt1.readDouble();
+            cout<<" p = "<<p<<endl;
+            return 0;
+        }
+        catch(char const *s)
+        {
+            cout<<s<<endl;
+            cout<<"Error in reading"<<endl;
+            return 0;
+        }
+        catch(string s)
+        {
+            cout<<s;
+            return 0;
+        }
+
+        cout<<"("<<p[0]<<","<<p[1]<<") - ("<<p[2]<<","<<p[3]<<")"<<endl;
+
+        t.closeConnection();
     }
-    catch(...)
+    catch(string s)
     {
-        cout<<"error";
-    }
-
-    cout<<endl<<"Reading back"<<endl;
-    double p[4];
-
-    Path pp1 = t.createPath("region.face[0].outerCycle.segment[0]");
-    Path pp2 = t.createPath("region.face[0].outerCycle.segment[1]");
-    Path pp3 = t.createPath("region.face[1].outerCycle.segment[2]");
-    Path pp4 = t.createPath("region.index[0]");
-
-    // READ BACK THE VALUE FROM face[0].outerCycle.Segment[1]
-    try{
-        pp4.readDoubleArray(p,sizeof(p));
-    	//cout << t.readString(pregionlabel);
-    }
-    catch(...)
-    {
-        cout<<"Error in reading"<<endl;
+        cout<<s<<endl;
         return 0;
     }
-
-    cout<<"("<<p[0]<<","<<p[1]<<") - ("<<p[2]<<","<<p[3]<<")"<<endl;
-
-    // CLOSE THE CONNECTIONS
-    //OCILobClose(svchp, errhp, mylob);
-    //checkerr(errhp, OCITransCommit(svchp, errhp, (ub4)0));
-    //if (envhp)
-        //(void) OCIHandleFree((dvoid *) envhp, OCI_HTYPE_ENV);
-	t.closeConnection();
-    return 0;
+    catch(char *s)
+    {
+        cout<<s<<endl;
+        return 0;
+    }
 }

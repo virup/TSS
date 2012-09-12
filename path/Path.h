@@ -42,24 +42,6 @@ private:
     // Helper function to iterate to a BO
     Locator gotoBO();
 
-public:
-	bool isBO();
-	bool isSO();
-   	bool isRef();
-	bool isList();
-	Type getBOType();
-    vector<int> getAccessCode();
-    bool isConsistent();
-    bool makeConsistent();
-    void makeInconsistent();
-
-    int readInt();// const;
-    double readDouble();// const;
-    string readString();// const;
-    int readIntArray(int *intBuf, uint bufsize);// const;
-    int readDoubleArray(double *doubleBuf, uint bufsize);// const;
-    int readBinary(unsigned char *buf, uint bufsize);// const;
-
 
     // Write functions: Throws exception if the insertion is out of order
     int setInt(int intVal);
@@ -67,9 +49,43 @@ public:
     int setIntArray(int *intBuf, uint size);
     int setDoubleArray(double *doubleBuf, uint size);
     int setBinary(unsigned char *charBuf, uint size);
-	int setRefTo(Path &path, int idx);
+	int setRef(Path &path);
 
-	bool removeObj(uint idx);
+
+public:
+	bool isBO();
+	bool isSO();
+   	bool isRO();
+	bool isList();
+    string pointingTo();
+    string getType();
+	Type getBOType();
+    vector<int> getAccessCode();
+    bool isConsistent();
+    bool makeConsistent();
+    void makeInconsistent();
+
+    // Read functions
+    int readInt();// const;
+    double readDouble();// const;
+    string readString();// const;
+    int readIntArray(int *intBuf, uint bufsize);// const;
+    int readDoubleArray(double *doubleBuf, uint bufsize);// const;
+    int readBinary(unsigned char *buf, uint bufsize);// const;
+
+    //Return the type which is being pointed to
+    //only if the path is RO() == true;
+    string pointingType();
+	bool removeObj();
+
+
+    //Append functions
+    Path append(Path &p);
+    Path append(int);
+    Path append(double);
+    Path append(int [], int size);
+    Path append(double [], int size);
+    Path append(unsigned char *, int size);
 
     // Add string component to a path object
 	Path & operator+(string p);
@@ -88,7 +104,7 @@ public:
     int set(int *, int size);
     int set(double *, int size);
     int set(unsigned char *, int size);
-    int set(Path &path, int idx);
+    int set(Path &path);
 
     friend class TSS;
 };

@@ -38,7 +38,7 @@ class TSS
         TSS(); // default constructor
         // constructor with tss file as input, isFile checks wether tssfile is a file or a string
         TSS(const char* tssfile, bool isFile = true);
-        TSS(const char* tssfile, void*, void*,void*, string);
+        TSS(const char* tssfile, bool , void*, void*,void*, string);
         ~TSS();// destructor
 
         //handles case when TSS grammar  is a string

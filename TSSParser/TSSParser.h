@@ -26,14 +26,18 @@ class TSSParser
     public:
        struct Node
         {
-            string name;                // Name of the node
+            // region:Region
+            string name;                // Name of the Type(eg "REGION")
+            string variableName;        // Name of the variable (eg "region")
             string objectType;
-            Type type;                  // Data type iif isBO
+            Type type;                  // is populated with data type iif isBO
             int no_of_children;         // No. of chilren
             bool isBO;                  // Tracks if nodes is BO
             bool isSO;
             bool isRO;
-            string pointingToType;
+            string pointingToType;      // only present if isRO == true
+            Node * pointingToNode;      // points to the note which the RO is pointing
+                                        // Only valid for RO objects
             bool isList;
             bool visited;               // Track if SO node has been visited
             int pos;                    // Position in the list of children
@@ -57,7 +61,8 @@ class TSSParser
                 child = NULL;
                 next = NULL;
            }
-            void setName(string name){this->name.assign(name);}
+            void setTypeName(string name){this->name.assign(name);}
+            void setVariableName(string varName){this->variableName.assign(varName);}
             void setObjectType(string type){this->objectType.assign(type);}
             void setType(Type type){this->type = type;}
             void setBO(){this->isBO = true;}
@@ -76,6 +81,9 @@ class TSSParser
             }
         };
 
+
+        string dataTypeName; // name of the main data type
+        bool isDataTypeNameFound; // true if dataTypeName has valid value
         Node *head;      // Actual data structure to store the grammar
         Node *current;
         string * grammar;
@@ -84,7 +92,7 @@ class TSSParser
         // Depth first search of grammar to check connected components
         bool visit(Node * );
         //return head of tree
-        Node *checkTreeAndReturnHead(map<string, Node*>);
+        //Node *checkTreeAndReturnHead(map<string, Node*>);
         //this vector will store RO objects encountered during parsing
         vector<string> ROObjects; 
         //this vector will store RO pointers (*pointer) encountered during parsing
@@ -93,37 +101,11 @@ class TSSParser
         list<Node*> nodes;
         Node * getParentNode();
 
-        //makes a copy of 'b' and stores it in 'a'
-        //this function is need to store heads in vector
-        void copy(Node *a, Node *b);
-
-        //this function is used to link individual nodes formed in buildTree() function. It
-        //is used by linkTree() function
-        void linkNodes(Node *a ,Node *b);
-
-        //this function makes individual tree of each line
-        //provided in the grammar. Then, it stores the head
-        //of each tree in the list.
-        void buildTree(string &);
-        void buildTree(vector<Node>);
-
-        //this function links all the trees together in to 1 tree
-        //using BFS algorithm
-        void linkTrees();
-
-        //this function prints the tree
-        void print();
-
-        //this function will check for each RO object there is a corresponding
-        //RO Pointer i.e 1-1 relation. If it is the case, then the function will
-        //return true
-        bool matchRO();
-
         //visit all nodes and delete it to free up memory
         void cleanUp();
 
-        // Tokenize a string
-        vector<string> tokenize(string, string);
+        // check connected graph or not
+        bool isConnected(map<string, TSSParser::Node *>);
 
 
     public:
@@ -133,7 +115,6 @@ class TSSParser
                                                 // isFile == true
         ~TSSParser();
          bool validateGrammar();   // Validate the given grammar
-         bool validateGrammar_1();   // Validate the given grammar
 
         //This function will break the objects from path string, and store corresponding
         //label and accesscode in pathVector. If the given string path is invalid, then
@@ -151,7 +132,10 @@ class TSSParser
         bool isBO(Path *p);
         bool isSO(Path *p);
         bool isList(Path *p);
-        bool isRef(Path *p);
+        bool isRO(Path *p);
+        string getPointingType(Path *p);
+        string getType(Path *p);
+        Node *gotoEnd(Path *p);
 
 	//return the root's type , this holds the data type of the TSS that the grammar describes
 	string getGrammarType();

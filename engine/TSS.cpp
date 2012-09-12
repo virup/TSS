@@ -19,10 +19,13 @@ static  OCIDefine *defnp2 = (OCIDefine *) 0;
 static  OCILobLocator *mylob;
 static  uint myid;
 
+void initialize(){
+}
 
-TSS::TSS(const char *tssfile, void *mylob, void *svchp, void *errhp,  string type="default")
+TSS::TSS(const char *tssfile, bool isFile, void *mylob, void *svchp, void *errhp,  string type="default")
 {
-    this->tp = new TSSParser(tssfile, false);
+    initialize();
+    this->tp = new TSSParser(tssfile, isFile);
     this->type = type;
     this->lobWrapper = new OCILobWrapper;
     this->lobWrapper->lob=(OCILobLocator *)mylob;
@@ -274,6 +277,7 @@ Path TSS::createPath()
 {
     string str = "";
     Path *p = new Path(str,(this->tp), (this->iblob));
+    cout<<"277 path created"<<endl;
     return *p;
 }
 
@@ -388,7 +392,7 @@ int TSS::count(Path &path)
 Path TSS::setRef(Path &objp1, Path &objp2, int idx)
 {
     try{
-	objp2.setRefTo(objp1, idx);
+	objp2.setRef(objp1);
     return objp2;
     }
     catch(...)
@@ -397,9 +401,9 @@ Path TSS::setRef(Path &objp1, Path &objp2, int idx)
     }
 }
 
-bool remove(Path &path, uint idx)
+bool remove(Path &path)
 {
-	return path.removeObj(idx);
+	return path.removeObj();
 }
 
 #endif

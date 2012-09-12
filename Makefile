@@ -13,7 +13,7 @@
 	CFLAGS = -ggdb -fpic -Wall
 
 #locations maybe not in path to include
-	INCLUDEIBLOB = -I $(RANJAN_ROOT)/iBLOB_V2/iBLOB -I $(RANJAN_ROOT)/iBLOB_V2/vector -I $(RANJAN_ROOT)/OCILobWrapper
+	INCLUDEIBLOB = -I $(RANJAN_ROOT)/iBLOB_V3/iBLOB -I $(RANJAN_ROOT)/iBLOB_V3/vector -I $(RANJAN_ROOT)/OCILobWrapper
 
 #include headers from the oracle_include
 	INCLUDEORACLEHEADERS = -I $(ORACLE_INCLUDE)
@@ -25,8 +25,9 @@
 	LDFLAGSSTAL = -L$(ORACLE_LIB1) -L$(ORACLE_LIB2)  -L$(RJNLIBS) -limslobs -locci
 
 #sources
-	SRCTSS = path/Path.cc TSSParser/TSSParser.cc TSSParser/Scanner.cc engine/TSS.cpp
-	OBJPATH = Path.o TSSParser.o TSS.o
+	TSSPARSER = TSSParser/TSSParser_new.cc
+	SRCTSS = path/Path.cc $(TSSPARSER) TSSParser/Scanner.cc engine/TSS.cpp
+	OBJPATH = Path.o TSSParser_new.o TSS.o
 
 #test related components
 	TESTSRC = test.cpp
@@ -43,9 +44,9 @@ test.out: $(OBJPATH) $(TESTOBJ)
 	$(LD) -o $(OUTFILE) $(TESTOBJ) $(ORACLELIB) $(OBJPATH) $(LDFLAGSSTAL) Scanner.o
 	@echo "-----------------Done!-------------------"
 
-TSSParser.o: TSSParser/TSSParser.cc TSSParser/Scanner.cc
+TSSParser_new.o: $(TSSPARSER) TSSParser/Scanner.cc
 	@echo "TSSParser begin compilation ..."
-	$(CC) $(CFLAGS) $(INCLUDEIBLOB) $(INCLUDEORACLEHEADERS) TSSParser/TSSParser.cc TSSParser/Scanner.cc
+	$(CC) $(CFLAGS) $(INCLUDEIBLOB) $(INCLUDEORACLEHEADERS) $(TSSPARSER) TSSParser/Scanner.cc
 	@echo "TSSParser done"
 
 test.o: test.cpp
@@ -57,6 +58,7 @@ Path.o: path/Path.cc
 	@echo "Path begin compilation ..."
 	$(CC) $(CFLAGS) $(INCLUDEIBLOB)  $(INCLUDEORACLEHEADERS) path/Path.cc
 	@echo "Path Done!"
+
 
 TSS.o:engine/TSS.cpp
 	@echo "TSS Engine begin compilation..."
@@ -71,3 +73,7 @@ clean:
 	$(RM) *.a
 	$(RM) engine/*.o
 	$(RM) engine/*.save*
+	$(RM) path/*.save*
+	$(RM) path/*.o
+	$(RM) TSSPARSER/*.save*
+	$(RM) TSSPARSER/*.o
