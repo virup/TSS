@@ -5,6 +5,7 @@
 #include "../path/Path.h"
 #include "../TSSParser/TSSParser.h"
 #include "constants.h"
+#include "iBlobStore.h"
 
 static sword status;
 static OCIEnv *envhp;
@@ -22,16 +23,12 @@ static  uint myid;
 void initialize(){
 }
 
-TSS::TSS(const char *tssfile, bool isFile, void *mylob, void *svchp, void *errhp,  string type="default")
+TSS::TSS(const char *tssfile, bool isFile, void *p, string type="default")
 {
     initialize();
     this->tp = new TSSParser(tssfile, isFile);
     this->type = type;
-    this->lobWrapper = new OCILobWrapper;
-    this->lobWrapper->lob=(OCILobLocator *)mylob;
-    this->lobWrapper->cntxt=(OCISvcCtx*)svchp;
-    this->lobWrapper->errhp=(OCIError*)errhp;
-    this->iblob  = new iBlob(this->lobWrapper, true);
+    this->iblob = (iBlob *)p;
 }
 
 TSS::TSS(const char *grammarString, string type)
@@ -40,17 +37,9 @@ TSS::TSS(const char *grammarString, string type)
 	this->type = type;
 }
 
-//TODO: one argument should be the data type name. Has been removed?  
+//TODO: one argument should be the data type name. Has been removed
 TSS::TSS(const char *grammarString, string serverPath, string username, string password, bool isFile)
 {
-	this->tp = new TSSParser(grammarString, false);
-	//this->type = ;
-	establishConnection(serverPath, username, password);
-    this->lobWrapper->lob= mylob;
-   this->lobWrapper->cntxt=svchp;
-    this->lobWrapper->errhp=errhp;
-    this->iblob  = new iBlob(this->lobWrapper, true);
-
 }
 
 //TODO: What does this function do exactly?
@@ -288,118 +277,12 @@ Path TSS::createPath(string strPath)
    return *p;
 }
 
-int TSS::readInt(Path &path)
-{
-    return path.readInt();
-}
-
-double TSS::readDouble(Path &path)
-{
-    return path.readDouble();
-}
-
-string TSS::readString(Path &path)
-{
-    return path.readString();
-}
-
-uint TSS::readIntArray(Path &path, int* intBuf, uint bufsize)
-{
-    return path.readIntArray(intBuf, bufsize);
-}
-
-
-int TSS::readDoubleArray(Path &path, double* doubleBuf, uint bufsize)
-{
-    return path.readDoubleArray(doubleBuf, bufsize);
-}
-int TSS::readBinary(Path &path, unsigned char* doubleBuf, uint bufsize)
-{
-    return path.readBinary(doubleBuf, bufsize);
-}
-
-Path TSS::setInt(Path &path, int value)
-{
-     path.setInt(value);
-     return path;
-}
-
-Path TSS::setDouble(Path &path, double value)
-{
-	path.setDouble(value);
-	return path;
-}
-
-Path TSS::setIntArray(Path &path, int array[], uint length)
-{
-	path.setIntArray(array, length);
-	return path;
-}
-
-Path TSS::setDoubleArray(Path &path, double array[], uint length)
-{
-	path.setDoubleArray(array, length);
-	return path;
-}
-
-
-
-//TODO: This logic has to be put in the Path class's function for setString.
-Path TSS::setString(Path &path, string value)
-{
-
-	uint length = (unsigned int) value.size(); // this can be dangerous--WHY?
-	//set the first 10 characters in the string to represent string length in decimal notation.
-	//convert the length into a string
-	string len;
-	string toAppend;
-	stringstream out;
-	out << length;
-	len = out.str();
-	//len is now the string representation of the lenght of  the string
-	//if the lenght is less that 10 digits (decimal notation), then pad the digits with 0's
-	if(len.size() < 10)
-	{
-		for(int  i = 0 ; i < 10 - len.size() ; i++)
-		{
-			toAppend.append("0");
-		}
-        toAppend.append(len);
-	}
-	else
-	{ //THROW EXCEPTION :: STRING TOO LARGE
-		cout<< "String too large to fit in the iBlob " << "handle this better?" << endl;
-	}
-	value.append(toAppend);
-	path.setBinary((unsigned char *) value.c_str(), length);
-	return path;
-}
-
-Path TSS::setBinary(Path &path, unsigned char* binaryarray, uint length)
-{
-	path.setBinary(binaryarray, length);
-	return path;
-}
-
-
 
 int TSS::count(Path &path)
 {
-	return path.count();
 }
 
 
-Path TSS::setRef(Path &objp1, Path &objp2, int idx)
-{
-    try{
-	objp2.setRef(objp1);
-    return objp2;
-    }
-    catch(...)
-    {
-        cout<<"exception in setRef"<<endl;
-    }
-}
 
 bool remove(Path &path)
 {

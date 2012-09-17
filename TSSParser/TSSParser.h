@@ -135,7 +135,7 @@ class TSSParser
         bool isRO(Path *p);
         string getPointingType(Path *p);
         string getType(Path *p);
-        Node *gotoEnd(Path *p);
+        Node *gotoEnd(Path *p, bool&);
 
 	//return the root's type , this holds the data type of the TSS that the grammar describes
 	string getGrammarType();

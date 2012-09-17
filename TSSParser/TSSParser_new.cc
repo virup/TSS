@@ -274,7 +274,6 @@ bool populate(map<string, vector<item> > &tokenizedStatements, string grammar)
     //2. for each statement:
     for(uint i = 0; i < statements.size(); i++)
     {
-        cout<<373<<statements[i]<<endl;
         // Check if it an import statements
         // if true, then recursively open that file and recover grammarSource
         // and then populate the tokenizedStatements
@@ -338,7 +337,6 @@ bool populate(map<string, vector<item> > &tokenizedStatements, string grammar)
         //3. put in the map
         tokenizedStatements[sides[0]] = *vItems;
     }
-
     return true;
 }
 
@@ -393,10 +391,9 @@ TSSParser::Node* createNode (string parentType, item *component,TSSParser::Node 
     n->setPos(count);
     nodeMaps[component->variableName] = n;
     return n;
-
 }
 
-void createNodes(string parentType, vector<item> *vItem, 
+void createNodes(string parentType, vector<item> *vItem,
         map<string, TSSParser::Node *> &nodeMaps)
 {
     vector<item> ::iterator it = vItem->begin();
@@ -458,7 +455,8 @@ string findHead(map<string, vector<item> > &tokenizedStatements)
     return "";
 }
 
-bool TSSParser::validateGrammar(){
+bool TSSParser::validateGrammar()
+{
     // vector<string> statements = tokenize(*this->grammar, ";");
     string grammarStr (*this->grammar);
 
@@ -495,7 +493,6 @@ bool TSSParser::validateGrammar(){
 
     // Create the actual tree from the nodes
     createTree(tokenizedStatements, nodeMaps);
-    cout<<"CreateTree Done!"<<endl;
     // Link up the head node (requires separate effort)
     vector<item> children = tokenizedStatements[dataTypeName];
     linkUp(children,headNode, nodeMaps);
@@ -544,14 +541,12 @@ int checkAndReturnList(string &comp)
 
 
 
-bool TSSParser::storeAccessCode(string strpath, vector<PathComponent>& pathVector) {
+bool TSSParser::storeAccessCode(string strpath, vector<PathComponent>& pathVector) 
+{
     bool returnVal = true;
     PathComponent pathComp;
     vector<string> strPathComp = tokenize(strpath, ".");
     //add the GLOBAL element
-    pathComp.label = "GLOBAL";
-    pathComp.accessCode = 0;
-    pathVector.push_back(pathComp);
 
     Node *current = this->head;
     if(strPathComp[0].compare(current->name)!=0)
@@ -559,7 +554,11 @@ bool TSSParser::storeAccessCode(string strpath, vector<PathComponent>& pathVecto
         cerr<<"Wrong path root"<<endl;
         throw string("wrong path root");
     }
-    //visitTree(current);
+
+    pathComp.label = current->name;
+    pathComp.accessCode = 0;
+    pathVector.push_back(pathComp);
+
     for(uint i = 1; i < strPathComp.size(); i++)
     {
         string component = strPathComp[i];
@@ -615,14 +614,19 @@ int * TSSParser::genAccessCode(Path *p) {
 }
 
 
-TSSParser::Node *TSSParser::gotoEnd(Path *p)
+TSSParser::Node *TSSParser::gotoEnd(Path *p, bool &lastItemIsListItem)
 {
-    bool retVal = true;
+    lastItemIsListItem = false;
     Node *current = head;
     //p->vPath[0].label == "GLOBAL"
     for(uint i = 1; i < p->vPath.size(); i++)
     {
-        if(p->vPath[i].label.compare("List") == 0) continue;
+        lastItemIsListItem = false;
+        if(p->vPath[i].label.compare("List") == 0)
+        {
+            lastItemIsListItem = true;
+            continue;
+        }
         if (current->children.find(p->vPath[i].label) != current->children.end())
         {
             current = current->children[p->vPath[i].label];
@@ -630,17 +634,18 @@ TSSParser::Node *TSSParser::gotoEnd(Path *p)
         else
         {
             cerr << p->vPath[i].label << " is not a valid path\n";
-            retVal = false;
             throw string("Error in path");
         }
     }
     return current;
 }
 
+
+
 string TSSParser::getPointingType(Path *p)
 {
-    Node *current = gotoEnd(p);
-    cout<<current->name<<endl;
+    bool lastItemIsListItem;
+    Node *current = gotoEnd(p, lastItemIsListItem);
     return current->pointingToType;
 
 }
@@ -648,10 +653,10 @@ string TSSParser::getPointingType(Path *p)
 
 string TSSParser::getType(Path *p)
 {
-    Node *current = gotoEnd(p);
+    bool lastItemIsListItem;
+    Node *current = gotoEnd(p, lastItemIsListItem);
     if(current->isRO)
         return string("&")+current->name;
-
     return current->name;
 
 }
@@ -659,7 +664,8 @@ string TSSParser::getType(Path *p)
 
 bool TSSParser::isBO(Path *p)
 {
-    Node *current = gotoEnd(p);
+    bool lastItemIsListItem;
+    Node *current = gotoEnd(p, lastItemIsListItem);
     if(current->isBO)
         return true;
     else
@@ -669,7 +675,8 @@ bool TSSParser::isBO(Path *p)
 
 bool TSSParser::isSO(Path *p)
 {
-    Node *current = gotoEnd(p);
+    bool lastItemIsListItem;
+    Node *current = gotoEnd(p, lastItemIsListItem);
     if(current->isSO)
         return true;
     else
@@ -678,8 +685,9 @@ bool TSSParser::isSO(Path *p)
 
 bool TSSParser::isList(Path *p)
 {
-    Node *current = gotoEnd(p);
-    if(current->isList)
+    bool lastItemIsListItem;
+    Node *current = gotoEnd(p, lastItemIsListItem);
+    if(current->isList && !lastItemIsListItem)
         return true;
     else
         return false;
@@ -687,7 +695,8 @@ bool TSSParser::isList(Path *p)
 
 bool TSSParser::isRO(Path *p)
 {
-    Node *current = gotoEnd(p);
+    bool lastItemIsListItem;
+    Node *current = gotoEnd(p, lastItemIsListItem);
     if(current->isRO)
         return true;
     else
@@ -696,7 +705,8 @@ bool TSSParser::isRO(Path *p)
 
 Type TSSParser::getBOType(Path *p)
 {
-    Node *current = gotoEnd(p);
+    bool lastItemIsListItem;
+    Node *current = gotoEnd(p, lastItemIsListItem);
     if (current->isBO)
         return current->type;
     else {
@@ -707,7 +717,8 @@ Type TSSParser::getBOType(Path *p)
 }
 
 
-void TSSParser::cleanUp() {
+void TSSParser::cleanUp()
+{
 
 }
 

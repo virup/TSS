@@ -1,7 +1,7 @@
 #include "iBlob.h"
 #include <iostream>
 #include "engine/TSS.h"
-
+#include "iBlobOracleStore.h"
 using namespace std;
 
 static char *username = (char *) "aist";
@@ -465,10 +465,13 @@ int main(int argc, char* argv[])
     // DECLARE A GRAMMAR FOR THE NEW DATA TYPE
     char* grammarFile = "region.tss";
 
+    iBlobStore * store = new iBlobOracleStore(mylob, errhp, svchp);
+    iBlob p (store, true);
 
     // CREATE A TSS OBJECT AND PROVIDE THE GRAMMAR
     try{
-        TSS t(grammarFile, true,  mylob, svchp, errhp, "Region");
+        //TSS t(grammarFile, true,  mylob, svchp, errhp, "Region");
+        TSS t(grammarFile, true, &p, "Region");
         //exit(0);
         //cout << "BEGIN TSS CONSTRUCTOR" << endl;
         //TSS t(regionGrammar, "Region");
@@ -499,18 +502,28 @@ int main(int argc, char* argv[])
         Path pface0O = pface0+"vocycle";
         Path pface0OSeg0 = pface0O + "vOseg[0]";
         Path pface0OSeg0lpt = pface0OSeg0 + "lpt";
+        cout<<"isList = "<<pface0OSeg0lpt.isList()<<endl;
+        cout<<"isBase = "<<pface0OSeg0lpt.isBO()<<endl;
+        Path pface0OSeg0lpt0 = pface0OSeg0lpt+ "[0]";
+        cout<<"isList = "<<pface0OSeg0lpt0.isList()<<endl;
+        cout<<"isBase = "<<pface0OSeg0lpt0.isBO()<<endl;
 
-        Path pface0OSeg0lpt1 = pface0OSeg0lpt + "[1]";
+        Path pface0OSeg0lpt1 = pface0OSeg0lpt+ "[1]";
+        cout<<"isList = "<<pface0OSeg0lpt1.isList()<<endl;
+        cout<<"isBase = "<<pface0OSeg0lpt1.isBO()<<endl;
 
+        Path pface0OSeg0lpt2 = pface0OSeg0lpt+ "[2]";
+        cout<<"isList = "<<pface0OSeg0lpt2.isList()<<endl;
+        cout<<"isBase = "<<pface0OSeg0lpt2.isBO()<<endl;
 
         Path pindex = t.createPath("region.vindex[0]");
 
         cout<<"Paths constructed"<<endl;
-        cout<<"isList = "<<pface0OSeg0lpt.isList()<<endl;
 
         // WRITE VALUES TO THE PATHS
         try{
-            cout<<pface0OSeg0lpt.set(f0OSeg0,sizeof(f0OSeg0));
+            cout<<pface0OSeg0lpt.set(f0OSeg0,sizeof(f0OSeg0)/sizeof(double));
+            cout<<pface0OSeg0lpt0.set(f0OSeg0[3]);
             cout<<"Setting reference "<<endl;
             cout<<pindex.set(pface0OSeg0);
             cout<<"Setting reference done ! "<<endl;
@@ -528,7 +541,7 @@ int main(int argc, char* argv[])
         }
 
         cout<<endl<<"Reading back"<<endl;
-        double p[4];
+        double *p;
 
         //     pface1OSeg2.removeObj();
 
@@ -538,8 +551,11 @@ int main(int argc, char* argv[])
             //pindex = pindex + "lpt";
             //pindex.readDoubleArray(p,sizeof(p));
             //cout << t.readString(pregionlabel);
-            double p = pface0OSeg0lpt1.readDouble();
-            cout<<" p = "<<p<<endl;
+            int size;
+            double p;
+            Path pindexLpt = pindex + "lpt[0]";
+            pindexLpt.read(p);
+            cout<<p<<endl;
             return 0;
         }
         catch(char const *s)

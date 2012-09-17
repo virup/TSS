@@ -22,7 +22,8 @@
 	RM = /bin/rm -f
 
 #Linker flags go here.
-	LDFLAGSSTAL = -L$(ORACLE_LIB1) -L$(ORACLE_LIB2)  -L$(RJNLIBS) -limslobs -locci
+	#LDFLAGSSTAL = -L$(ORACLE_LIB1) -L$(ORACLE_LIB2)  -L$(RJNLIBS) -limslobs -locci
+	LDFLAGSSTAL = -L$(ORACLE_LIB1) -L$(ORACLE_LIB2)  -L$(RJNLIBS) -liblob -locci
 
 #sources
 	TSSPARSER = TSSParser/TSSParser_new.cc
@@ -54,7 +55,7 @@ test.o: test.cpp
 	$(CC) $(CFLAGS) $(TESTSRC) $(INCLUDEIBLOB) $(INCLUDEORACLEHEADERS)
 	@echo "Test File Done ..."
 
-Path.o: path/Path.cc
+Path.o: path/Path.cc path/Path.h
 	@echo "Path begin compilation ..."
 	$(CC) $(CFLAGS) $(INCLUDEIBLOB)  $(INCLUDEORACLEHEADERS) path/Path.cc
 	@echo "Path Done!"
