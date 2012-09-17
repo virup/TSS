@@ -72,11 +72,7 @@ public:
 
     //Append functions
     Path append(Path &p);
-    Path append(int);
-    Path append(double);
-    Path append(int [], int size);
-    Path append(double [], int size);
-    Path append(unsigned char *, int size);
+    template<class T> int append(T *val, int size);
 
     // Add string component to a path object
 	Path & operator+(string p);
@@ -148,7 +144,6 @@ int Path::set(T *val, int size)
     {
         iblob->insertVal(val[i], vPath[vPath.size()-1].loc, i);
     }
-    cout<<"Size == "<<vPath[vPath.size()-1].loc.getElements()<<endl;
 
     this->consistent =  true;
     return 1;
@@ -179,9 +174,6 @@ uint Path::read(T &val)
 template<class T>
 uint Path::read(T *&val, int &size)
 {
-    for(int i = 0; i < vPath.size(); i++)
-        cout<<vPath[i].accessCode<<".";
-    cout<<endl;
     if(!this->isConsistent())
         this->makeConsistent();
     if(this->isRO() || (this->isBO() && this->isList()))
@@ -190,7 +182,6 @@ uint Path::read(T *&val, int &size)
         if(this->isRO())
             lTop = this->iblob->locate(lTop, vPath[vPath.size()-1].accessCode);
         size = lTop.getElements();
-        cout<<size<<endl;
         val = new T[size];
         for(uint i = 0; i < size; i++)
         {
@@ -207,5 +198,32 @@ uint Path::read(T *&val, int &size)
         throw string("Error reading array");
     }
     return 1;
+}
+template<class T>
+int Path::append(T *val, int size)
+{
+    if(!this->isList())
+        throw string("This is not a list.");
+    if(!this->isBO())
+        throw string("This is not BO");
+
+    Locator l;
+    try{
+        l = gotoBO();
+    }
+    catch(string s)
+    {
+        cout<<s<<endl;
+        return 0;
+    }
+    int length = vPath[vPath.size() -1].loc.getElements();
+
+    for(uint i = 0; i < size; i++)
+    {
+        iblob->insertVal(val[i], vPath[vPath.size()-1].loc,length+i-1);
+    }
+    this->consistent =  true;
+    return 1;
+
 }
 #endif

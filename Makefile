@@ -26,9 +26,9 @@
 	LDFLAGSSTAL = -L$(ORACLE_LIB1) -L$(ORACLE_LIB2)  -L$(RJNLIBS) -liblob -locci
 
 #sources
-	TSSPARSER = TSSParser/TSSParser_new.cc
-	SRCTSS = path/Path.cc $(TSSPARSER) TSSParser/Scanner.cc engine/TSS.cpp
-	OBJPATH = Path.o TSSParser_new.o TSS.o
+	TSSPARSER = TSSParser/TSSParser.cpp
+	SRCTSS = path/Path.cpp $(TSSPARSER) TSSParser/Scanner.cc engine/TSS.cpp
+	OBJPATH = Path.o TSSParser.o TSS.o
 
 #test related components
 	TESTSRC = test.cpp
@@ -55,7 +55,7 @@ test.o: test.cpp
 	$(CC) $(CFLAGS) $(TESTSRC) $(INCLUDEIBLOB) $(INCLUDEORACLEHEADERS)
 	@echo "Test File Done ..."
 
-Path.o: path/Path.cc path/Path.h
+Path.o: path/Path.cpp path/Path.h
 	@echo "Path begin compilation ..."
 	$(CC) $(CFLAGS) $(INCLUDEIBLOB)  $(INCLUDEORACLEHEADERS) path/Path.cc
 	@echo "Path Done!"

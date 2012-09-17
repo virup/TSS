@@ -524,8 +524,9 @@ int main(int argc, char* argv[])
         try{
             cout<<pface0OSeg0lpt.set(f0OSeg0,sizeof(f0OSeg0)/sizeof(double));
             cout<<pface0OSeg0lpt0.set(f0OSeg0[3]);
+            cout<<pface0OSeg0lpt.append(f0OSeg1, sizeof(f0OSeg1)/sizeof(double));
             cout<<"Setting reference "<<endl;
-            cout<<pindex.set(pface0OSeg0);
+            cout<<pindex.set(pface0OSeg0)<<endl;
             cout<<"Setting reference done ! "<<endl;
         }
         catch(string s)
@@ -552,10 +553,11 @@ int main(int argc, char* argv[])
             //pindex.readDoubleArray(p,sizeof(p));
             //cout << t.readString(pregionlabel);
             int size;
-            double p;
-            Path pindexLpt = pindex + "lpt[0]";
-            pindexLpt.read(p);
-            cout<<p<<endl;
+            Path pindexlpt = pindex + "lpt";
+            pindexlpt.read(p, size);
+            for(int i = 0; i < size; i++)
+                cout<<"p[] "<<p[i]<<endl;
+
             return 0;
         }
         catch(char const *s)
