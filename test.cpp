@@ -477,15 +477,7 @@ int main(int argc, char* argv[])
 
     // CREATE A TSS OBJECT AND PROVIDE THE GRAMMAR
     try{
-        //TSS t(grammarFile, true,  mylob, svchp, errhp, "Region");
         TSS t(grammarFile, true);
-        //exit(0);
-        //cout << "BEGIN TSS CONSTRUCTOR" << endl;
-        //TSS t(regionGrammar, "Region");
-        //t.establishConnection(string("phoenix.cise.ufl.edu:1521/orcl"),string(username), string(password));
-
-        //TSS t(regionGrammar,string("phoenix.cise.ufl.edu:1521/orcl"),string(username), string(password), false, "Region");
-
         cout << "DEFINE DATA SEGMENTS " << endl;
 
         // DEFINE SOME SEGMENT DATA
