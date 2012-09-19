@@ -1,10 +1,3 @@
-/* 
- * File:   TSSParser.h
- * Author: Archesh
- *
- * Created on March 29, 2012, 3:28 PM
- */
-
 #ifndef TSSPARSER_H
 #define	TSSPARSER_H
 
@@ -21,67 +14,68 @@
 
 using namespace std;
 
+class Node
+{
+    public:
+    string name;                // Name of the Type(eg "REGION")
+    string variableName;        // Name of the variable (eg "region")
+    string objectType;
+    Type type;                  // is populated with data type iif isBO
+    int no_of_children;         // No. of chilren
+    bool isBO;                  // Tracks if nodes is BO
+    bool isSO;
+    bool isRO;
+    string pointingToType;      // only present if isRO == true
+    Node * pointingToNode;      // points to the note which the RO is pointing
+    // Only valid for RO objects
+    bool isList;
+    bool visited;               // Track if SO node has been visited
+    int pos;                    // Position in the list of children
+    map <string, Node *> children; //pointers to children
+    Node * parent;
+    Node * child;
+    Node * next;
+
+    public:
+
+    Node() {
+        name = "";
+        objectType = "";
+        no_of_children = 0;
+        isBO = false;
+        isRO = false;
+        isSO = false;
+        isList = false;
+        visited = false;
+        pos = -1;
+        parent = NULL;
+        child = NULL;
+        next = NULL;
+    }
+    void setTypeName(string name){this->name.assign(name);}
+    void setVariableName(string varName){this->variableName.assign(varName);}
+    void setObjectType(string type){this->objectType.assign(type);}
+    void setType(Type type){this->type = type;}
+    void setBO(){this->isBO = true;}
+    void setSO(){this->isSO = true;}
+    void setRO(){this->isRO = true;}
+    void setPos(int p){this->pos = p;}
+    void setNext(Node *n){this->next = n;}
+    void setList(bool b){this->isList = b;}
+    void addChild(string s, Node *n){
+        children.insert(pair<string, Node*>(s,n));
+        n->parent = this;
+    }
+    void setPointingToType(string strtypename)
+    {
+        this->pointingToType.assign(strtypename);
+    }
+};
+
+
 class TSSParser
 {
     public:
-       struct Node
-        {
-            // region:Region
-            string name;                // Name of the Type(eg "REGION")
-            string variableName;        // Name of the variable (eg "region")
-            string objectType;
-            Type type;                  // is populated with data type iif isBO
-            int no_of_children;         // No. of chilren
-            bool isBO;                  // Tracks if nodes is BO
-            bool isSO;
-            bool isRO;
-            string pointingToType;      // only present if isRO == true
-            Node * pointingToNode;      // points to the note which the RO is pointing
-                                        // Only valid for RO objects
-            bool isList;
-            bool visited;               // Track if SO node has been visited
-            int pos;                    // Position in the list of children
-            map <string, Node *> children; //pointers to children
-            Node * parent;
-            Node * child;
-            Node * next;
-
-
-            Node() {
-                name = "";
-                objectType = "";
-                no_of_children = 0;
-                isBO = false;
-                isRO = false;
-                isSO = false;
-                isList = false;
-                visited = false;
-                pos = -1;
-                parent = NULL;
-                child = NULL;
-                next = NULL;
-           }
-            void setTypeName(string name){this->name.assign(name);}
-            void setVariableName(string varName){this->variableName.assign(varName);}
-            void setObjectType(string type){this->objectType.assign(type);}
-            void setType(Type type){this->type = type;}
-            void setBO(){this->isBO = true;}
-            void setSO(){this->isSO = true;}
-            void setRO(){this->isRO = true;}
-            void setPos(int p){this->pos = p;}
-            void setNext(Node *n){this->next = n;}
-            void setList(bool b){this->isList = b;}
-            void addChild(string s, Node *n){
-                children.insert(pair<string, Node*>(s,n));
-                n->parent = this;
-            }
-            void setPointingToType(string strtypename)
-            {
-                this->pointingToType.assign(strtypename);
-            }
-        };
-
-
         string dataTypeName; // name of the main data type
         bool isDataTypeNameFound; // true if dataTypeName has valid value
         Node *head;      // Actual data structure to store the grammar
@@ -91,30 +85,18 @@ class TSSParser
 
         // Depth first search of grammar to check connected components
         bool visit(Node * );
-        //return head of tree
-        //Node *checkTreeAndReturnHead(map<string, Node*>);
-        //this vector will store RO objects encountered during parsing
-        vector<string> ROObjects; 
-        //this vector will store RO pointers (*pointer) encountered during parsing
-        vector<string> ROPointers;
-
-        list<Node*> nodes;
         Node * getParentNode();
 
-        //visit all nodes and delete it to free up memory
-        void cleanUp();
-
         // check connected graph or not
-        bool isConnected(map<string, TSSParser::Node *>);
+        bool isConnected(map<string, Node *>);
 
 
-    public:
 
         TSSParser(); //default constructor
         TSSParser(string grammar, bool isFile); // grammar is a file name if
-                                                // isFile == true
+        // isFile == true
         ~TSSParser();
-         bool validateGrammar();   // Validate the given grammar
+        bool validateGrammar();   // Validate the given grammar
 
         //This function will break the objects from path string, and store corresponding
         //label and accesscode in pathVector. If the given string path is invalid, then
@@ -137,10 +119,10 @@ class TSSParser
         string getType(Path *p);
         Node *gotoEnd(Path *p, bool&);
 
-	//return the root's type , this holds the data type of the TSS that the grammar describes
-	string getGrammarType();
+        //return the root's type , this holds the data type of the TSS that the grammar describes
+        string getGrammarType();
 
-	//If the type of a particular object in grammar is BO, then
+        //If the type of a particular object in grammar is BO, then
         //following function will return the exact type of that BO.
         //Type could be Int, IntAR, Double, DoubleAR, String, or Byte
         Type getBOType(Path *p);

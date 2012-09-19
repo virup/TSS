@@ -42,12 +42,12 @@
 
 test.out: $(OBJPATH) $(TESTOBJ)
 	@echo "start LINKING and LOADING"
-	$(LD) -o $(OUTFILE) $(TESTOBJ) $(ORACLELIB) $(OBJPATH) $(LDFLAGSSTAL) Scanner.o
+	$(LD) -o $(OUTFILE) $(TESTOBJ) $(ORACLELIB) $(OBJPATH) $(LDFLAGSSTAL)
 	@echo "-----------------Done!-------------------"
 
-TSSParser.o: $(TSSPARSER) TSSParser/Scanner.cc
+TSSParser.o: $(TSSPARSER)
 	@echo "TSSParser begin compilation ..."
-	$(CC) $(CFLAGS) $(INCLUDEIBLOB) $(INCLUDEORACLEHEADERS) $(TSSPARSER) TSSParser/Scanner.cc
+	$(CC) $(CFLAGS) $(INCLUDEIBLOB) $(INCLUDEORACLEHEADERS) $(TSSPARSER)
 	@echo "TSSParser done"
 
 test.o: test.cpp

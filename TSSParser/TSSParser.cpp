@@ -12,14 +12,14 @@ using namespace std;
 typedef unsigned uint;
 
 // testing function to be removed!
-void visitTree(TSSParser::Node *head)
+void visitTree(Node *head)
 {
     if(head->parent)
         cerr<<" Parent = "<<head->parent->name<<"  ";
     cerr<<"Self =|"<<head->variableName<<"|  "<<head->type<<endl;
     if(head->children.size()!= 0)
     {
-        map<string, TSSParser::Node *>::iterator it = head->children.begin();
+        map<string, Node *>::iterator it = head->children.begin();
         for(; it != head->children.end(); it++)
             visitTree(it->second);
     }
@@ -107,7 +107,7 @@ bool isList(string s)
 }
 
 // check if TSS gramamr is connected 
-bool TSSParser::visit(TSSParser::Node *n)
+bool TSSParser::visit(Node *n)
 {
     if(n->visited)
         return true;
@@ -127,10 +127,10 @@ bool checkIfBO(string type)
 }
 
 
-bool TSSParser::isConnected(map<string, TSSParser::Node*> nodeMaps)
+bool TSSParser::isConnected(map<string, Node*> nodeMaps)
 {
-    TSSParser::Node *head = NULL;
-    map<string, TSSParser::Node *>::iterator it;
+    Node *head = NULL;
+    map<string, Node *>::iterator it;
     int parentMissing = 0;
     for(it = nodeMaps.begin(); it != nodeMaps.end(); it++)
         if(it->second->parent == NULL && it->second->isBO != true)
@@ -161,7 +161,7 @@ bool TSSParser::isConnected(map<string, TSSParser::Node*> nodeMaps)
         {
             if(!checkIfBO(it->second->pointingToType))
             {
-                map<string, TSSParser::Node *>::iterator iit;
+                map<string, Node *>::iterator iit;
                 for(iit = nodeMaps.begin(); iit != nodeMaps.end(); iit++)
                 {
                     if(iit->second->name.compare(it->second->pointingToType)==0)
@@ -364,10 +364,10 @@ string getUndefined(map<string, vector<item> >& tokenizedStatements)
 
 
 
-TSSParser::Node* createNode (string parentType, item *component,TSSParser::Node *left,
-        int count, map<string, TSSParser::Node *> &nodeMaps)
+Node* createNode (string parentType, item *component,Node *left,
+        int count, map<string, Node *> &nodeMaps)
 {
-    TSSParser::Node *n = new TSSParser::Node;
+    Node *n = new Node;
     n->setTypeName(component->typeName);
     n->setVariableName(component->variableName);
     n->visited = false;
@@ -395,10 +395,10 @@ TSSParser::Node* createNode (string parentType, item *component,TSSParser::Node 
 }
 
 void createNodes(string parentType, vector<item> *vItem,
-        map<string, TSSParser::Node *> &nodeMaps)
+        map<string, Node *> &nodeMaps)
 {
     vector<item> ::iterator it = vItem->begin();
-    TSSParser::Node *temp = NULL;
+    Node *temp = NULL;
     int count = 0;
     while(it != vItem->end())
     {
@@ -408,19 +408,19 @@ void createNodes(string parentType, vector<item> *vItem,
 
 }
 
-void linkUp(vector<item> &children, TSSParser::Node *localHead,
-        map<string, TSSParser::Node*> &nodeMaps)
+void linkUp(vector<item> &children, Node *localHead,
+        map<string, Node*> &nodeMaps)
 {
     vector<item> ::iterator cit = children.begin();
     while(cit!= children.end())
     {
-        TSSParser::Node *childNode = nodeMaps[cit->variableName];
+        Node *childNode = nodeMaps[cit->variableName];
         localHead->addChild(cit->variableName, childNode);
         cit++;
     }
 }
 void createTree(map<string, vector<item> > &tokenizedStatements,
-        map<string, TSSParser::Node *> &nodeMaps)
+        map<string, Node *> &nodeMaps)
 {
 
     map<string, vector<item> > ::iterator iToken = tokenizedStatements.begin();
@@ -439,7 +439,7 @@ void createTree(map<string, vector<item> > &tokenizedStatements,
                 vit++;
                 continue;
             }
-            TSSParser::Node * localHead = nodeMaps[vit->variableName];
+            Node * localHead = nodeMaps[vit->variableName];
 
             string vName(vit->variableName);
             string tName(vit->typeName);
@@ -471,7 +471,7 @@ bool TSSParser::validateGrammar()
         this->dataTypeName = findHead(tokenizedStatements);
 
     // Actual grammar tree is stored here
-    map<string, TSSParser::Node*> nodeMaps;
+    map<string, Node*> nodeMaps;
 
     map<string, vector<item> >::iterator it = tokenizedStatements.begin();
 
@@ -483,7 +483,7 @@ bool TSSParser::validateGrammar()
     }
 
     // Create the head nodes
-    TSSParser::Node *headNode = new TSSParser::Node();
+    Node *headNode = new Node();
     headNode->setTypeName(dataTypeName);
     headNode->setVariableName(dataTypeName);
     headNode->setSO();
@@ -509,9 +509,9 @@ bool TSSParser::validateGrammar()
 
 
 
-void printChildren(map<string, TSSParser::Node *> maplist)
+void printChildren(map<string, Node *> maplist)
 {
-    map<string, TSSParser::Node *>:: iterator it;
+    map<string, Node *>:: iterator it;
     cout<<"Children are: "<<endl;
     for(it = maplist.begin(); it!= maplist.end(); it++)
     {
@@ -615,7 +615,7 @@ int * TSSParser::genAccessCode(Path *p) {
 }
 
 
-TSSParser::Node *TSSParser::gotoEnd(Path *p, bool &lastItemIsListItem)
+Node *TSSParser::gotoEnd(Path *p, bool &lastItemIsListItem)
 {
     lastItemIsListItem = false;
     Node *current = head;
@@ -717,11 +717,6 @@ Type TSSParser::getBOType(Path *p)
 
 }
 
-
-void TSSParser::cleanUp()
-{
-
-}
 
 
 string TSSParser::getGrammarType()
