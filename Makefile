@@ -45,7 +45,7 @@ test.out: $(OBJPATH) $(TESTOBJ)
 	$(LD) -o $(OUTFILE) $(TESTOBJ) $(ORACLELIB) $(OBJPATH) $(LDFLAGSSTAL) Scanner.o
 	@echo "-----------------Done!-------------------"
 
-TSSParser_new.o: $(TSSPARSER) TSSParser/Scanner.cc
+TSSParser.o: $(TSSPARSER) TSSParser/Scanner.cc
 	@echo "TSSParser begin compilation ..."
 	$(CC) $(CFLAGS) $(INCLUDEIBLOB) $(INCLUDEORACLEHEADERS) $(TSSPARSER) TSSParser/Scanner.cc
 	@echo "TSSParser done"
@@ -57,7 +57,7 @@ test.o: test.cpp
 
 Path.o: path/Path.cpp path/Path.h
 	@echo "Path begin compilation ..."
-	$(CC) $(CFLAGS) $(INCLUDEIBLOB)  $(INCLUDEORACLEHEADERS) path/Path.cc
+	$(CC) $(CFLAGS) $(INCLUDEIBLOB)  $(INCLUDEORACLEHEADERS) path/Path.cpp
 	@echo "Path Done!"
 
 

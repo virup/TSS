@@ -51,7 +51,8 @@ string getFromFile(string &grammarSource)
     return grammar;
 }
 
-TSSParser::TSSParser(string grammarSource, bool isFile) {
+TSSParser::TSSParser(string grammarSource, bool isFile)
+{
     string grammar;
     //will take care of file input later
     if(isFile)

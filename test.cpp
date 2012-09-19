@@ -456,6 +456,13 @@ int prepareBLOB_In_DB(string connectionString,string username, string password)
     //
 }
 
+void closeConnection(){
+    OCILobClose(svchp, errhp, mylob);
+    checkerr(errhp, OCITransCommit(svchp, errhp, (ub4)0));
+    if (envhp)
+        (void) OCIHandleFree((dvoid *) envhp, OCI_HTYPE_ENV);
+
+}
 int main(int argc, char* argv[])
 {
     // ESTABLISH CONNECTION TO THE DATABASE
@@ -471,7 +478,7 @@ int main(int argc, char* argv[])
     // CREATE A TSS OBJECT AND PROVIDE THE GRAMMAR
     try{
         //TSS t(grammarFile, true,  mylob, svchp, errhp, "Region");
-        TSS t(grammarFile, true, &p, "Region");
+        TSS t(grammarFile, true);
         //exit(0);
         //cout << "BEGIN TSS CONSTRUCTOR" << endl;
         //TSS t(regionGrammar, "Region");
@@ -498,7 +505,7 @@ int main(int argc, char* argv[])
         //Path testPath = t.createPath();
         // CREATE SOME REQUIRED PATHS
         //region.vFace[0].vocycle.vOseg[0]
-        Path pface0 = t.createPath("region.vface[0]");
+        Path pface0 = t.createPath("region.vface[0]", &p);
         Path pface0O = pface0+"vocycle";
         Path pface0OSeg0 = pface0O + "vOseg[0]";
         Path pface0OSeg0lpt = pface0OSeg0 + "lpt";
@@ -516,7 +523,7 @@ int main(int argc, char* argv[])
         cout<<"isList = "<<pface0OSeg0lpt2.isList()<<endl;
         cout<<"isBase = "<<pface0OSeg0lpt2.isBO()<<endl;
 
-        Path pindex = t.createPath("region.vindex[0]");
+        Path pindex = t.createPath("region.vindex[0]", &p);
 
         cout<<"Paths constructed"<<endl;
 
@@ -574,7 +581,7 @@ int main(int argc, char* argv[])
 
         cout<<"("<<p[0]<<","<<p[1]<<") - ("<<p[2]<<","<<p[3]<<")"<<endl;
 
-        t.closeConnection();
+        closeConnection();
     }
     catch(string s)
     {

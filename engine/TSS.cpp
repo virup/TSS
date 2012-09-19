@@ -6,7 +6,9 @@
 #include "../TSSParser/TSSParser.h"
 #include "constants.h"
 #include "iBlobStore.h"
+#include "iBlob.h"
 
+/*
 static sword status;
 static OCIEnv *envhp;
 static OCIError *errhp;
@@ -22,40 +24,21 @@ static  uint myid;
 
 void initialize(){
 }
+*/
 
-TSS::TSS(const char *tssfile, bool isFile, void *p, string type="default")
+
+TSS::TSS(const char *grammarString, bool isFile)
 {
-    initialize();
-    this->tp = new TSSParser(tssfile, isFile);
+	this->tp = new TSSParser(grammarString, isFile);
     this->type = type;
-    this->iblob = (iBlob *)p;
 }
 
-TSS::TSS(const char *grammarString, string type)
-{
-	this->tp = new TSSParser(grammarString, false);
-	this->type = type;
-}
-
-//TODO: one argument should be the data type name. Has been removed
-TSS::TSS(const char *grammarString, string serverPath, string username, string password, bool isFile)
-{
-}
-
-//TODO: What does this function do exactly?
-TSS::TSS(const char* tssfile, bool isFile)
-{
-	//need the TSS Parser Constructor that can handle file -> in ../TSSParser/Parser.h -> indicated that this will be implemented later.
-}
-
-TSS::TSS()
-{}
 
 
 //TODO: IMPORTANT to implement it. Otherwise there are memory leaks
 TSS::~TSS()
 {}
-
+/*
 static void checkerr(OCIError *errhp, sword status)
 {
     text errbuf[512];
@@ -258,28 +241,20 @@ void TSS::closeConnection()
         (void) OCIHandleFree((dvoid *) envhp, OCI_HTYPE_ENV);
 
 }
+*/
 
-
-
-//TODO: Check if it works or not.
-Path TSS::createPath()
+Path TSS::createPath(void *storageHandle)
 {
     string str = "";
-    Path *p = new Path(str,(this->tp), (this->iblob));
-    cout<<"277 path created"<<endl;
+    Path *p = new Path(str, (this->tp), (iBlob *)storageHandle);
     return *p;
 }
 
 
-Path TSS::createPath(string strPath)
+Path TSS::createPath(string strPath, void *storageHandle)
 {
-   Path *p = new Path(strPath, (this->tp), (this->iblob));
+   Path *p = new Path(strPath, (this->tp), (iBlob *)storageHandle);
    return *p;
-}
-
-
-int TSS::count(Path &path)
-{
 }
 
 
