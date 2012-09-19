@@ -15,60 +15,74 @@ using namespace std;
 
 class Node
 {
-    public:
-    string name;                // Name of the Type(eg "REGION")
-    string variableName;        // Name of the variable (eg "region")
+    private:
+    string mname;                // Name of the Type(eg "REGION")
+    string mvariableName;        // Name of the variable (eg "region")
     string objectType;
-    Type type;                  // is populated with data type iif isBO
+    Type mtype;                  // is populated with data type iif isBO
     int no_of_children;         // No. of chilren
-    bool isBO;                  // Tracks if nodes is BO
-    bool isSO;
-    bool isRO;
-    string pointingToType;      // only present if isRO == true
+    bool misBO;                  // Tracks if nodes is BO
+    bool misSO;
+    bool misRO;
+    string mpointingToType;      // only present if isRO == true
     Node * pointingToNode;      // points to the note which the RO is pointing
     // Only valid for RO objects
-    bool isList;
-    bool visited;               // Track if SO node has been visited
-    int pos;                    // Position in the list of children
-    map <string, Node *> children; //pointers to children
-    Node * parent;
-    Node * child;
-    Node * next;
+    bool misList;
+    int mpos;                    // Position in the list of children
+    Node * mparent;
+    Node * mchild;
+    Node * mnext;
 
     public:
+    map <string, Node *> children; //pointers to children
+    bool visited;               // Track if SO node has been visited
 
     Node() {
-        name = "";
+        mname = "";
         objectType = "";
         no_of_children = 0;
-        isBO = false;
-        isRO = false;
-        isSO = false;
-        isList = false;
+        misBO = false;
+        misRO = false;
+        misSO = false;
+        misList = false;
         visited = false;
-        pos = -1;
-        parent = NULL;
-        child = NULL;
-        next = NULL;
+        mpos = -1;
+        mparent = NULL;
+        mchild = NULL;
+        mnext = NULL;
     }
-    void setTypeName(string name){this->name.assign(name);}
-    void setVariableName(string varName){this->variableName.assign(varName);}
     void setObjectType(string type){this->objectType.assign(type);}
-    void setType(Type type){this->type = type;}
-    void setBO(){this->isBO = true;}
-    void setSO(){this->isSO = true;}
-    void setRO(){this->isRO = true;}
-    void setPos(int p){this->pos = p;}
-    void setNext(Node *n){this->next = n;}
-    void setList(bool b){this->isList = b;}
+    void setBO(){this->misBO = true;}
+    void setSO(){this->misSO = true;}
+    void setRO(){this->misRO = true;}
+    void setPos(int p){this->mpos = p;}
+    int pos(){return mpos;}
+    void setList(bool b){this->misList = b;}
     void addChild(string s, Node *n){
         children.insert(pair<string, Node*>(s,n));
-        n->parent = this;
+        n->mparent = this;
     }
     void setPointingToType(string strtypename)
     {
-        this->pointingToType.assign(strtypename);
+        this->mpointingToType.assign(strtypename);
     }
+    string pointingToType(){return this->mpointingToType;}
+    bool isRO(){return misRO;}
+    bool isSO(){return misSO;}
+    bool isBO(){return misBO;}
+    bool isList(){return misList;}
+    Node * parent(){return mparent;}
+    Node * child(){return mchild;}
+    Node * next(){return mnext;}
+    void setParent(Node *n){this->mparent = n;}
+    void setChild(Node *n){this->mchild = n;}
+    void setNext(Node *n){this->mnext = n;}
+    string name(){return this->mname;}
+    void setTypeName(string name){this->mname.assign(name);}
+    void setVariableName(string varName){this->mvariableName.assign(varName);}
+    string variableName(){return this->mvariableName;}
+    void setType(Type t){this->mtype = t;}
+    Type type(){return this->mtype;}
 };
 
 

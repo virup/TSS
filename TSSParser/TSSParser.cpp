@@ -5,15 +5,15 @@
 #include <iostream>
 #include <algorithm>
 #include <sstream>
+
 using namespace std;
 typedef unsigned uint;
 
-// testing function to be removed!
 void visitTree(Node *head)
 {
-    if(head->parent)
-        cerr<<" Parent = "<<head->parent->name<<"  ";
-    cerr<<"Self =|"<<head->variableName<<"|  "<<head->type<<endl;
+    if(head->parent())
+        cerr<<" Parent = "<<head->parent()->name()<<"  ";
+    cerr<<"Self =|"<<head->variableName()<<"|  "<<head->type()<<endl;
     if(head->children.size()!= 0)
     {
         map<string, Node *>::iterator it = head->children.begin();
@@ -130,7 +130,7 @@ bool TSSParser::isConnected(map<string, Node*> nodeMaps)
     map<string, Node *>::iterator it;
     int parentMissing = 0;
     for(it = nodeMaps.begin(); it != nodeMaps.end(); it++)
-        if(it->second->parent == NULL && it->second->isBO != true)
+        if(it->second->parent() == NULL && it->second->isBO() != true)
         {
             parentMissing++;
             head = it->second;
@@ -154,14 +154,14 @@ bool TSSParser::isConnected(map<string, Node*> nodeMaps)
     // children of RO objects == children of refered object.
     for(it = nodeMaps.begin(); it != nodeMaps.end(); it++)
     {
-        if(it->second->isRO)
+        if(it->second->isRO())
         {
-            if(!checkIfBO(it->second->pointingToType))
+            if(!checkIfBO(it->second->pointingToType()))
             {
                 map<string, Node *>::iterator iit;
                 for(iit = nodeMaps.begin(); iit != nodeMaps.end(); iit++)
                 {
-                    if(iit->second->name.compare(it->second->pointingToType)==0)
+                    if(iit->second->name().compare(it->second->pointingToType())==0)
                     {
                         it->second->children = iit->second->children;
                         break;
@@ -547,13 +547,13 @@ bool TSSParser::storeAccessCode(string strpath, vector<PathComponent>& pathVecto
     //add the GLOBAL element
 
     Node *current = this->head;
-    if(strPathComp[0].compare(current->name)!=0)
+    if(strPathComp[0].compare(current->name())!=0)
     {
         cerr<<"Wrong path root"<<endl;
         throw string("wrong path root");
     }
 
-    pathComp.label = current->name;
+    pathComp.label = current->name();
     pathComp.accessCode = 0;
     pathVector.push_back(pathComp);
 
@@ -575,7 +575,7 @@ bool TSSParser::storeAccessCode(string strpath, vector<PathComponent>& pathVecto
             if (current->children.find(component) != current->children.end())
             {
                 current = current->children[component];
-                pathVector[i].accessCode = current->pos;
+                pathVector[i].accessCode = current->pos();
             }
             else
             {
@@ -591,7 +591,7 @@ bool TSSParser::storeAccessCode(string strpath, vector<PathComponent>& pathVecto
             if (current->children.find(component) != current->children.end())
             {
                 current = current->children[component];
-                pathVector[i].accessCode = current->pos;
+                pathVector[i].accessCode = current->pos();
             }
             else
             {
@@ -644,7 +644,7 @@ string TSSParser::getPointingType(Path *p)
 {
     bool lastItemIsListItem;
     Node *current = gotoEnd(p, lastItemIsListItem);
-    return current->pointingToType;
+    return current->pointingToType();
 
 }
 
@@ -653,9 +653,9 @@ string TSSParser::getType(Path *p)
 {
     bool lastItemIsListItem;
     Node *current = gotoEnd(p, lastItemIsListItem);
-    if(current->isRO)
-        return string("&")+current->name;
-    return current->name;
+    if(current->isRO())
+        return string("&")+current->name();
+    return current->name();
 
 }
 
@@ -664,7 +664,7 @@ bool TSSParser::isBO(Path *p)
 {
     bool lastItemIsListItem;
     Node *current = gotoEnd(p, lastItemIsListItem);
-    if(current->isBO)
+    if(current->isBO())
         return true;
     else
         return false;
@@ -675,7 +675,7 @@ bool TSSParser::isSO(Path *p)
 {
     bool lastItemIsListItem;
     Node *current = gotoEnd(p, lastItemIsListItem);
-    if(current->isSO)
+    if(current->isSO())
         return true;
     else
         return false;
@@ -685,7 +685,7 @@ bool TSSParser::isList(Path *p)
 {
     bool lastItemIsListItem;
     Node *current = gotoEnd(p, lastItemIsListItem);
-    if(current->isList && !lastItemIsListItem)
+    if(current->isList() && !lastItemIsListItem)
         return true;
     else
         return false;
@@ -695,7 +695,7 @@ bool TSSParser::isRO(Path *p)
 {
     bool lastItemIsListItem;
     Node *current = gotoEnd(p, lastItemIsListItem);
-    if(current->isRO)
+    if(current->isRO())
         return true;
     else
         return false;
@@ -705,8 +705,8 @@ Type TSSParser::getBOType(Path *p)
 {
     bool lastItemIsListItem;
     Node *current = gotoEnd(p, lastItemIsListItem);
-    if (current->isBO)
-        return current->type;
+    if (current->isBO())
+        return current->type();
     else {
         cerr << "Object is not BO\n";
         return UNDEFINED;
@@ -718,5 +718,5 @@ Type TSSParser::getBOType(Path *p)
 
 string TSSParser::getGrammarType()
 {
-    return head->name;
+    return head->name();
 }

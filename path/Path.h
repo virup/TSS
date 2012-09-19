@@ -140,7 +140,7 @@ int Path::set(T *val, int size)
     vPath[vPath.size()-1].loc  = iblob->insert(l,
                                                vPath[vPath.size()-2].accessCode,
                                                OBJECT_LEVEL);
-    for(uint i = 0; i < size; i++)
+    for(int i = 0; i < size; i++)
     {
         iblob->insertVal(val[i], vPath[vPath.size()-1].loc, i);
     }
@@ -183,7 +183,7 @@ uint Path::read(T *&val, int &size)
             lTop = this->iblob->locate(lTop, vPath[vPath.size()-1].accessCode);
         size = lTop.getElements();
         val = new T[size];
-        for(uint i = 0; i < size; i++)
+        for(int i = 0; i < size; i++)
         {
             T tempval;
             Locator l = this->iblob->locate(lTop, i);
@@ -218,7 +218,7 @@ int Path::append(T *val, int size)
     }
     int length = vPath[vPath.size() -1].loc.getElements();
 
-    for(uint i = 0; i < size; i++)
+    for(int i = 0; i < size; i++)
     {
         iblob->insertVal(val[i], vPath[vPath.size()-1].loc,length+i-1);
     }
