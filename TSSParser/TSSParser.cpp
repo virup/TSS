@@ -1,7 +1,4 @@
 #include "TSSParser.h"
-#include "Scanner.h"
-#include <cstring>
-#include <map>
 #include <queue>
 #include <string>
 #include <fstream>
@@ -723,5 +720,3 @@ string TSSParser::getGrammarType()
 {
     return head->name;
 }
-#include "TSSParser.h"
-#include "Scanner.h"

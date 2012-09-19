@@ -4,7 +4,6 @@
 
 #include "../path/Path.h"
 #include "../engine/constants.h"
-#include "Scanner.h"
 #include <cstring>
 #include <cstdlib>
 #include <map>
