@@ -3,20 +3,13 @@
 
 #include <iostream>
 #include "constants.h"
-#include "../path/Path.h"
+#include "Path.h"
 #include <string>
 #include <fstream>
 #include <sstream>
-#include <oci.h>
-#include <stdexcept>
-#include <time.h>
-#include <sys/time.h>
-#include <vector>
-#include <algorithm>
-#include "iBlob.h"
 #include <sstream>
+#include <string.h>
 
-#include "Locator.h"
 /** class definition for TSS.
 TSS: Type System Specification
 Provides a semantic way for access components
@@ -30,6 +23,7 @@ class TSS
         // constructor with tss file as input, isFile checks wether tssfile is a file or a string
         TSS(); // default constructor
         TSS(const char* tssfile,bool isFile=true);
+        TSS(string tssfile,bool isFile=true);
         ~TSS();// destructor
 
 
@@ -38,8 +32,8 @@ class TSS
         void setStoreHandle(void* b, bool ismem = false);// associate blob handler
 
         /* Create Path */
-        Path createPath(void *);
-        Path createPath(string strPath, void *);
+        Path createPath(void *) const;
+        Path createPath(string strPath, void *) const ;
 
         /* Insert Functions */
 
@@ -48,7 +42,6 @@ class TSS
 
     private:
         TSSParser *tp;
-        iBlob *iblob;
         string type;
 };
 

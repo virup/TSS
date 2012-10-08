@@ -1,0 +1,3 @@
+Segment ::= lPt:Coordinate rPt:Coordinate;
+Coordinate ::= lat:double lon:double;
+

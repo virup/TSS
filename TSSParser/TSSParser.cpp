@@ -9,6 +9,7 @@
 using namespace std;
 typedef unsigned uint;
 
+
 void visitTree(Node *head)
 {
     if(head->parent())
@@ -51,11 +52,13 @@ string getFromFile(string &grammarSource)
 TSSParser::TSSParser(string grammarSource, bool isFile)
 {
     string grammar;
-    //will take care of file input later
     if(isFile)
     {
         this->grammar = new string(getFromFile(grammarSource));
-        this->dataTypeName.assign(grammarSource.substr(0, grammarSource.find(".")));
+        int fileNameStart = grammarSource.rfind("/");
+        if(fileNameStart == string::npos)
+            fileNameStart = -1;
+        this->dataTypeName.assign(grammarSource,fileNameStart+1, grammarSource.find(".")-fileNameStart-1);
         this->isDataTypeNameFound = true;
     }
     else
@@ -132,9 +135,14 @@ bool TSSParser::isConnected(map<string, Node*> nodeMaps)
     for(it = nodeMaps.begin(); it != nodeMaps.end(); it++)
         if(it->second->parent() == NULL && it->second->isBO() != true)
         {
+            cout<<
             parentMissing++;
             head = it->second;
         }
+
+
+    cout<<"parentMissing = "<<parentMissing<<endl;
+
     if(parentMissing != 1)
     {
         cerr<<"Error in creating tree. Please check hierarchy"<<endl;

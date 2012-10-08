@@ -1,7 +1,7 @@
-#include "iBlob.h"
 #include <iostream>
-#include "engine/TSS.h"
-#include "iBlobOracleStore.h"
+#include "TSS.h"
+#include "Segment.h"
+#include "ObjLocOracle.h"
 using namespace std;
 
 static char *username = (char *) "aist";
@@ -19,7 +19,6 @@ static	OCIStmt	*stmthp;
 static	OCIDefine *defnp = (OCIDefine *) 0;
 static	OCIDefine *defnp2 = (OCIDefine *) 0;
 static	OCILobLocator *mylob;
-
 
 static uint myid;
 
@@ -124,50 +123,6 @@ int prepareBLOB_In_DB(string connectionString,string username, string password)
                 OCI_HTYPE_STMT, (size_t) 0, (dvoid **) 0));
 
 
-/*
-    //first clear all rows  
-    checkerr(errhp, OCIStmtPrepare(stmthp, errhp, (text *)"DELETE FROM test_iblobs",
-                (ub4)strlen("DELETE FROM test_iblobs"),
-                (ub4) OCI_NTV_SYNTAX, (ub4) OCI_DEFAULT));
-
-    checkerr(errhp, OCIStmtExecute(svchp, stmthp, errhp, (ub4) 1, (ub4) 0,
-                (CONST OCISnapshot *) NULL, (OCISnapshot *) NULL, OCI_COMMIT_ON_SUCCESS));
-
-    uint rows_deleted;
-
-    checkerr(errhp, OCIAttrGet ( stmthp, OCI_HTYPE_STMT, &rows_deleted, 0, 
-                OCI_ATTR_ROW_COUNT, errhp )); 
-
-    cout << rows_deleted << " rows were deleted from the 'TEST_IBLOBS' table " << endl;
-
-    sqlQuery = "INSERT INTO usstates (id, state) VALUES(1, region(EMPTY_BLOB()))";
-
-    //cout << "sqlQuery = " << sqlQuery << endl;
-    checkerr(errhp, OCIStmtPrepare(stmthp, errhp, (text *)(sqlQuery.c_str()),
-                (ub4)strlen(sqlQuery.c_str()), (ub4) OCI_NTV_SYNTAX, (ub4) OCI_DEFAULT));
-
-    status = OCIStmtExecute(svchp, stmthp, errhp, (ub4) 1, (ub4) 0,
-            (CONST OCISnapshot *) NULL, (OCISnapshot *) NULL, OCI_DEFAULT);
-
-    if (status==OCI_SUCCESS || status==OCI_SUCCESS_WITH_INFO)
-    {
-        cout << "Inserted empty blob with id 1" << endl;
-
-    }else{
-        text errbuf[512];
-        ub4 buflen;
-        sb4 errcode;
-
-        OCIErrorGet (errhp, (ub4) 1, (text *) NULL, &errcode,
-                errbuf, (ub4) sizeof(errbuf), (ub4) OCI_HTYPE_ERROR);
-
-        string er=(char*)errbuf;
-        cout << "Error: " << er << endl;
-        throw runtime_error("Unable to insert tuple.");
-    }
-
-    checkerr(errhp, OCITransCommit(svchp, errhp, (ub4)0));
-*/
     //allocate lob descriptor
     if (OCIDescriptorAlloc((dvoid *) envhp, (dvoid **) &mylob,
                 (ub4)OCI_DTYPE_LOB, (size_t) 0, (dvoid **) 0))
@@ -232,117 +187,24 @@ void closeConnection(){
 int main(int argc, char* argv[])
 {
     // ESTABLISH CONNECTION TO THE DATABASE
+    // and create the datastructures required for Oracle connection
+    // like OCILobLocator *, ServerContext etc.
     prepareBLOB_In_DB(string("phoenix.cise.ufl.edu:1521/orcl"), string(username), string(password));
-
-
-    // DECLARE A GRAMMAR FOR THE NEW DATA TYPE
-    char* grammarFile = "/home/aistdev/TSS/Segment.tss";
-
-    cout<<mylob<<endl;
-    //iBlobStore * store = new iBlobOracleStore(mylob, errhp, svchp);
-    iBlobStore * store = new iBlobOracleStore(mylob, errhp, svchp);
-    iBlob p (store, false);
-
-    p.printStats();
-    // CREATE A TSS OBJECT AND PROVIDE THE GRAMMAR
     try{
-        TSS t(grammarFile, true);
-        cout << "DEFINE DATA SEGMENTS " << endl;
 
-        // DEFINE SOME SEGMENT DATA
-        double f0OSeg0[] = {1.0,3.0,1.5,0.5};
-        double f0OSeg1[] = {1.5,0.5,3.0,0.5};
-        double f0OSeg2[] = {3.0,0.5,3.0,2.0};
-        double f0OSeg3[] = {3.0, 2.0, 1.0,3.0};
-        double f0HSeg0[] = {2.0,1.0, 2.5,1.0};
-        double f0HSeg1[] = {2.5,1.0,2.0,2.0};
-        double f0HSeg2[] = {2.0,2.0,2.0,1.0};
+        // Create an uninitialized Segment object
+        Segment seg1;
 
-        double f1OSeg0[] = {5.0,1.0,7.0,1.0};
-        double f1OSeg1[] = {7.0,1.0,6.0,3.0};
-        double f1OSeg2[] = {6.0,3.0,5.0,1.0};
+        // Create a Oracle Store Location
+        ObjLoc *ol = new ObjLocOracle(mylob, errhp, svchp);
 
+        // Bind the Segment to the Oracle Store Location
+        ol->bind(seg1);
 
-        //Path testPath = t.createPath();
-        // CREATE SOME REQUIRED PATHS
-        //region.vFace[0].vocycle.vOseg[0]
-        Path pface0 = t.createPath("region.vface[0]", &p);
-        Path pface0O = pface0+"vocycle";
-        Path pface0OSeg0 = pface0O + "vOseg[0]";
-        Path pface0OSeg0lpt = pface0OSeg0 + "lpt";
-        cout<<"isList = "<<pface0OSeg0lpt.isList()<<endl;
-        cout<<"isBase = "<<pface0OSeg0lpt.isBO()<<endl;
-        Path pface0OSeg0lpt0 = pface0OSeg0lpt+ "[0]";
-        cout<<"isList = "<<pface0OSeg0lpt0.isList()<<endl;
-        cout<<"isBase = "<<pface0OSeg0lpt0.isBO()<<endl;
-
-        Path pface0OSeg0lpt1 = pface0OSeg0lpt+ "[1]";
-        cout<<"isList = "<<pface0OSeg0lpt1.isList()<<endl;
-        cout<<"isBase = "<<pface0OSeg0lpt1.isBO()<<endl;
-
-        Path pface0OSeg0lpt2 = pface0OSeg0lpt+ "[2]";
-        cout<<"isList = "<<pface0OSeg0lpt2.isList()<<endl;
-        cout<<"isBase = "<<pface0OSeg0lpt2.isBO()<<endl;
-
-        Path pindex = t.createPath("region.vindex[0]", &p);
-
-        cout<<"Paths constructed"<<endl;
-
-        // WRITE VALUES TO THE PATHS
-        try{
-  //          cout<<pface0OSeg0lpt.set(f0OSeg0,sizeof(f0OSeg0)/sizeof(double));
-  //          cout<<pface0OSeg0lpt0.set(f0OSeg0[3]);
-  //          cout<<pface0OSeg0lpt.append(f0OSeg1, sizeof(f0OSeg1)/sizeof(double));
-  //          cout<<"Setting reference "<<endl;
-  //          cout<<pindex.set(pface0OSeg0)<<endl;
-  //          cout<<"Setting reference done ! "<<endl;
-        }
-        catch(string s)
-        {
-            cout<<s<<endl;
-            cout<<"error";
-            return 0;
-        }
-        catch(char *s)
-        {
-            cout<<s;
-            return 0;
-        }
-
-        cout<<endl<<"Reading back"<<endl;
-        double *p;
-
-        //     pface1OSeg2.removeObj();
-
-        // READ BACK THE VALUE FROM face[0].outerCycle.Segment[1]
-
-        try{
-            //pindex = pindex + "lpt";
-            //pindex.readDoubleArray(p,sizeof(p));
-            //cout << t.readString(pregionlabel);
-            int size;
-            //Path pindexlpt = pindex + "lpt";
-            pface0OSeg0lpt.read(p, size);
-            for(int i = 0; i < size; i++)
-                cout<<"p[] "<<p[i]<<endl;
-
-            closeConnection();
-            return 0;
-        }
-        catch(char const *s)
-        {
-            cout<<s<<endl;
-            cout<<"Error in reading"<<endl;
-            return 0;
-        }
-        catch(string s)
-        {
-            cout<<s;
-            return 0;
-        }
-
-        cout<<"("<<p[0]<<","<<p[1]<<") - ("<<p[2]<<","<<p[3]<<")"<<endl;
-
+        // Work on the Segment object using provided functions
+        seg1.insertValue(0.0,0.0,10.0,10.0);
+        seg1.insertValue(-1.0, -1.0, -1.0, -1.0);
+        seg1.print();
     }
     catch(string s)
     {
@@ -354,4 +216,10 @@ int main(int argc, char* argv[])
         cout<<s<<endl;
         return 0;
     }
+    catch(...)
+    {
+        cout<<"Error happened and an exception was thrown"<<endl;
+        return 0;
+    }
+    return 1;
 }
