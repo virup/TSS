@@ -6,13 +6,12 @@
 class Segment:public UDT
 {
     private:
-        const std::string grammarFile;
-        const TSS t;
+        class SegmentImpl;
+        SegmentImpl *segment;
 
     public:
-        Segment():grammarFile("segment/Segment.tss"), t(grammarFile, true)
-         {}
+        Segment() {}
         int insertValue(double x1, double y1, double x2, double y2);
         void print();
-
+        ~Segment();
 };
