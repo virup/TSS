@@ -203,7 +203,6 @@ int main(int argc, char* argv[])
 
         // Work on the Segment object using provided functions
         seg1.insertValue(0.0,0.0,10.0,10.0);
-        seg1.insertValue(-1.0, -1.0, -1.0, -1.0);
         seg1.print();
     }
     catch(string s)

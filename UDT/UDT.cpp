@@ -18,4 +18,9 @@ bool UDT::isStorageAllocated()
 {
     return bStorageAllocated;
 }
+
+iBlob *UDT::getStore()
+{
+    return store;
+}
 #endif

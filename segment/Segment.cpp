@@ -1,6 +1,6 @@
 #include "TSS.h"
 #include "UDT.h"
-
+#include "Segment.h"
 #include <string.h>
 
 class Segment::SegmentImpl
@@ -10,11 +10,13 @@ class Segment::SegmentImpl
         const TSS t;
 
     public:
-        SegmentImpl():grammarFile("segment/SegmentImpl.tss"), t(grammarFile, true):segment(new SegmentImpl){}
-        int insertValue(double x1, double y1, double x2, double y2);
-        void print();
-        ~SegmentImpl();
+        SegmentImpl():grammarFile("segment/Segment.tss"), t(grammarFile, true){}
+        int insertValue(double x1, double y1, double x2, double y2, iBlob *);
+        void print(iBlob *);
 };
+
+Segment::Segment():segment(new SegmentImpl)
+{}
 
 
 Segment::~Segment()
@@ -25,25 +27,23 @@ Segment::~Segment()
 
 int Segment::insertValue(double x1, double y1, double x2, double y2)
 {
-    if(!segment->isStorageAllocated())
-        return;
-    segment->insertValue(x1,y1, x2,y2);
+    if(!isStorageAllocated())
+        return 0;
+    return segment->insertValue(x1,y1, x2,y2, getStore());
 }
 
-void print()
+void Segment::print()
 {
-   if(!isStorageAllocated)
-       return;
-   segment->print();
+    if(!isStorageAllocated())
+        return ;
+   segment->print(getStore());
 }
 
 int Segment::SegmentImpl::insertValue(double x1, double y1,
-                  double x2, double y2)
+                  double x2, double y2, iBlob *store)
 {
-    if(!isStorageAllocated())
-        return 0;
-    Path pLpt = t.createPath("SegmentImpl.lPt", store);
-    Path pRpt = t.createPath("SegmentImpl.rPt", store);
+    Path pLpt = t.createPath("Segment.lPt", store);
+    Path pRpt = t.createPath("Segment.rPt", store);
 
     Path pLptLat = pLpt + "lat";
     pLptLat.set(x1);
@@ -60,15 +60,13 @@ int Segment::SegmentImpl::insertValue(double x1, double y1,
     return 1;
 }
 
-void Segment::SegmentImpl::print()
+void Segment::SegmentImpl::print(iBlob *store)
 {
-    if(!isStorageAllocated())
-        return ;
 
     double x1, y1, x2, y2;
 
-    Path pLpt = t.createPath("SegmentImpl.lPt", store);
-    Path pRpt = t.createPath("SegmentImpl.rPt", store);
+    Path pLpt = t.createPath("Segment.lPt", store);
+    Path pRpt = t.createPath("Segment.rPt", store);
 
     Path pLptLat = pLpt + "lat";
     pLptLat.read(x1);

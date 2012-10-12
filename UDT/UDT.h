@@ -8,6 +8,7 @@ class UDT
     protected:
         iBlob *store;
         bool bStorageAllocated;
+        iBlob* getStore();
 
     public:
         UDT();
