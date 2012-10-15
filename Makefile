@@ -62,9 +62,9 @@ segment.out: $(OBJPATH) Segment.o $(TESTSEGMENTOBJ) $(TESTOBJ)
 	$(LD) -o $(SEGMENTFILE) $(TESTSEGMENTOBJ) Segment.o $(ORACLELIB) $(OBJPATH) $(LDFLAGSSTAL)
 	@echo "-----------------segment Done!-------------------"
 
-stresssegment.out: $(OBJPATH) stressTestSegment.o $(TESTSEGMENTOBJ) $(TESTOBJ)
-	@echo "start LINKING and LOADING"
-	$(LD) -o $(SEGMENTFILE) $(TESTSEGMENTOBJ) stressTestSegment.o $(ORACLELIB) $(OBJPATH) $(LDFLAGSSTAL)
+stresssegment.out: $(OBJPATH) stressTestSegment.o Segment.o $(TESTSEGMENTOBJ) $(TESTOBJ)
+	@echo "start LINKING and LOADING stress test"
+	$(LD) -o stresssegment.out $(TESTSEGMENTOBJ) stressTestSegment.o $(ORACLELIB) $(OBJPATH) $(LDFLAGSSTAL)
 	@echo "-----------------Stress segment Done!-------------------"
 
 TSSParser.o: $(TSSPARSER)
@@ -106,12 +106,12 @@ Segment.o:segment/Segment.cpp
 testsegment.o: testsegment.cpp
 	@echo "Test file begin compilation ..."
 	$(CC) $(CFLAGS) $(testsegment) $(INCLUDEIBLOB) $(INCLUDEORACLEHEADERS) $(INCLUDE_OBJLOC) $(INCLUDE_UDT) $(INCLUDE_TSS) -I segment/ testsegment.cpp
-	@echo "Test File Done ..."
+	@echo "Test segment File Done ..."
 
 stressTestSegment.o: stressTestSegment.cpp
 	@echo "Test file begin compilation ..."
 	$(CC) $(CFLAGS) $(testsegment) $(INCLUDEIBLOB) $(INCLUDEORACLEHEADERS) $(INCLUDE_OBJLOC) $(INCLUDE_UDT) $(INCLUDE_TSS) -I segment/ testsegment.cpp
-	@echo "Test File Done ..."
+	@echo "Stress Test File Done ..."
 
 clean:
 	-rm *.o
