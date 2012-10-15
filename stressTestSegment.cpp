@@ -2,7 +2,7 @@
 #include "TSS.h"
 #include "Segment.h"
 #include "ObjLocOracle.h"
-#include <cstdlib.h>
+#include <stdlib.h>
 #include "iBlob.h"
 using namespace std;
 
