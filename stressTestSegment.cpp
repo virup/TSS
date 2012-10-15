@@ -273,7 +273,7 @@ void write_to_blob(int number)
 }
 int main(int argc, char* argv[])
 {
-    write_to_blob(COUNT);
+    //write_to_blob(COUNT);
     write_to_blob_TSS(COUNT);
     return 1;
 }
