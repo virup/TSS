@@ -3,6 +3,7 @@
 #include "Segment.h"
 #include "ObjLocOracle.h"
 #include <cstdlib.h>
+#include "iBlob.h"
 using namespace std;
 
 
