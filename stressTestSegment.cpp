@@ -2,6 +2,7 @@
 #include "TSS.h"
 #include "Segment.h"
 #include "ObjLocOracle.h"
+#include <cstdlib.h>
 using namespace std;
 
 
@@ -26,6 +27,13 @@ static	OCILobLocator *mylob;
 
 static uint myid;
 
+
+//function to get a random double number
+double fRand(double fMin, double fMax)
+{
+        double f = (double)rand() / RAND_MAX;
+        return fMin + f * (fMax - fMin);
+}
 
 static void checkerr(OCIError *errhp, sword status)
 {
@@ -211,7 +219,7 @@ void write_to_blob_TSS(int number)
 
         for(int i = 0; i < number; it++)
         {
-            x1 = random(0,MAX)
+            x1 = fRand(0,MAX)
             // Work on the Segment object using provided functions
             seg.insertValue(x1,y1, x2, y2);
         }
