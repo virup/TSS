@@ -277,10 +277,10 @@ void write_to_blob(int number)
         Locator lLPTy = p.insert(lLeftPtr, 1);
         Locator lRPTx = p.insert(lRightPtr, 0);
         Locator lLPTx = p.insert(lRightPtr, 1);
-        x1 = fRand(0,MAX);
-        y1 = fRand(0,MAX);
-        x2 = fRand(0,MAX);
-        y2 = fRand(0,MAX);
+        double x1 = fRand(0,MAX);
+        double y1 = fRand(0,MAX);
+        double x2 = fRand(0,MAX);
+        double y2 = fRand(0,MAX);
         p.insert(lLPTx, x1);
         p.insert(lLPTy, y1);
         p.insert(lRPTx, x2);
