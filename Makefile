@@ -110,7 +110,7 @@ testsegment.o: testsegment.cpp
 
 stressTestSegment.o: stressTestSegment.cpp
 	@echo "Test file begin compilation ..."
-	$(CC) $(CFLAGS) $(testsegment) $(INCLUDEIBLOB) $(INCLUDEORACLEHEADERS) $(INCLUDE_OBJLOC) $(INCLUDE_UDT) $(INCLUDE_TSS) -I segment/ testsegment.cpp
+	$(CC) $(CFLAGS) stressTestSegment.cpp  $(INCLUDEIBLOB) $(INCLUDEORACLEHEADERS) $(INCLUDE_OBJLOC) $(INCLUDE_UDT) $(INCLUDE_TSS) -I segment/ testsegment.cpp
 	@echo "Stress Test File Done ..."
 
 clean:
