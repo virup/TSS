@@ -266,7 +266,7 @@ void write_to_blob(int number)
     iBlob p (store, false);
 
     /* IBLOB FUNCTIONS USED TO CREATE THE SEGMENT OBJECT */
-    Locator l = locateGlobal(p);
+    //Locator l = locateGlobal(p);
 
 
 
