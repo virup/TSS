@@ -218,9 +218,9 @@ void write_to_blob_TSS(int number)
         // Bind the Segment to the Oracle Store Location
         ol->bind(seg);
 
-        for(int i = 0; i < number; it++)
+        for(int i = 0; i < number; i++)
         {
-            x1 = fRand(0,MAX)
+            x1 = fRand(0,MAX);
             // Work on the Segment object using provided functions
             seg.insertValue(x1,y1, x2, y2);
         }
