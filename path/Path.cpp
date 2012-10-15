@@ -202,7 +202,7 @@ int Path::set(Path &path)
     for(it = path.vPath.begin(); it != path.vPath.end() ; it++)
         tempLoc = it->loc;
 
-    cout<<vPath[vPath.size()-1].accessCode<<endl;
+    //cout<<vPath[vPath.size()-1].accessCode<<endl;
     try{
         l2 = iblob->insert(tempLoc, l2, vPath[vPath.size()-1].accessCode);
     }
@@ -245,10 +245,10 @@ Locator Path::gotoBO()
             cerr<<"Path::gotoBO - Discontinuity detected"<<endl;
             throw string("discontinuity");
         }
-        cout<<it->accessCode<<".";
+       // cout<<it->accessCode<<".";
         it++;
     }while(it!= vPath.end()-1);
-    cout<<endl;
+    //cout<<endl;
 
     if(l.getElements() < (uint)it->accessCode)
         throw string("Not Present");

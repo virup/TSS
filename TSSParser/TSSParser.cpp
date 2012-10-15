@@ -135,13 +135,9 @@ bool TSSParser::isConnected(map<string, Node*> nodeMaps)
     for(it = nodeMaps.begin(); it != nodeMaps.end(); it++)
         if(it->second->parent() == NULL && it->second->isBO() != true)
         {
-            cout<<
-            parentMissing++;
+            cout<< parentMissing++;
             head = it->second;
         }
-
-
-    cout<<"parentMissing = "<<parentMissing<<endl;
 
     if(parentMissing != 1)
     {
