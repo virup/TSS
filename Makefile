@@ -51,16 +51,16 @@
 	SEGMENTFILE = segment.out
 
 
-#test.out: $(OBJPATH) $(TESTOBJ)
-#	@echo "start LINKING and LOADING"
-#	$(LD) -o $(OUTFILE) $(TESTOBJ) $(ORACLELIB) $(OBJPATH) $(LDFLAGSSTAL)
-#	@echo "-----------------Done!-------------------"
-#
-#
-#segment.out: $(OBJPATH) Segment.o $(TESTSEGMENTOBJ) $(TESTOBJ)
-#	@echo "start LINKING and LOADING"
-#	$(LD) -o $(SEGMENTFILE) $(TESTSEGMENTOBJ) Segment.o $(ORACLELIB) $(OBJPATH) $(LDFLAGSSTAL)
-#	@echo "-----------------segment Done!-------------------"
+test.out: $(OBJPATH) $(TESTOBJ)
+	@echo "start LINKING and LOADING"
+	$(LD) -o $(OUTFILE) $(TESTOBJ) $(ORACLELIB) $(OBJPATH) $(LDFLAGSSTAL)
+	@echo "-----------------Done!-------------------"
+
+
+segment.out: $(OBJPATH) Segment.o $(TESTSEGMENTOBJ) $(TESTOBJ)
+	@echo "start LINKING and LOADING"
+	$(LD) -o $(SEGMENTFILE) $(TESTSEGMENTOBJ) Segment.o $(ORACLELIB) $(OBJPATH) $(LDFLAGSSTAL)
+	@echo "-----------------segment Done!-------------------"
 
 stresssegment.out: $(OBJPATH) stressTestSegment.o Segment.o $(TESTSEGMENTOBJ) $(TESTOBJ)
 	@echo "start LINKING and LOADING stress test"
