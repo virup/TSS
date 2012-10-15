@@ -218,12 +218,17 @@ void write_to_blob_TSS(int number)
         // Bind the Segment to the Oracle Store Location
         ol->bind(seg);
 
+        // Start the timer
+        clock_t begin=clock();
+
         for(int i = 0; i < number; i++)
         {
             x1 = fRand(0,MAX);
             // Work on the Segment object using provided functions
             seg.insertValue(x1,y1, x2, y2);
         }
+        clock_t end=clock();
+        cout << "Time elapsed: " << double(diffclock(end,begin)) << " ms"<< endl;
     }
     catch(string s)
     {
