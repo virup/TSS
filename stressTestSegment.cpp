@@ -231,6 +231,9 @@ void write_to_blob_TSS(int number)
         for(int i = 0; i < number; i++)
         {
             x1 = fRand(0,MAX);
+            y1 = fRand(0,MAX);
+            x2 = fRand(0,MAX);
+            y2 = fRand(0,MAX);
             // Work on the Segment object using provided functions
             seg.insertValue(x1,y1, x2, y2);
         }
@@ -256,27 +259,38 @@ void write_to_blob(int number)
     // ESTABLISH CONNECTION TO THE DATABASE
     prepareBLOB_In_DB(string("phoenix.cise.ufl.edu:1521/orcl"), string(username), string(password));
 
-
-    // DECLARE A GRAMMAR FOR THE NEW DATA TYPE
-    char* grammarFile = "/home/aistdev/TSS/Segment.tss";
-
-    cout<<mylob<<endl;
     //iBlobStore * store = new iBlobOracleStore(mylob, errhp, svchp);
     iBlobStore * store = new iBlobOracleStore(mylob, errhp, svchp);
     iBlob p (store, false);
 
+    // Start the timer
+    clock_t begin=clock();
+
     /* IBLOB FUNCTIONS USED TO CREATE THE SEGMENT OBJECT */
-    //Locator l = locateGlobal(p);
-
-
-
-
-
-
+    for(int i = 0; i < number; i++)
+    {
+        Locator lGlobal = p.locateGlobal();
+        locateGlobal.insert(0, OBJECT_LEVEL);
+        Locator lLeftPt = p.locate(lGlobal,0);
+        Locator lRightPt = p.Locate(lGlobal, 1);
+        Locator lLPTx = p.insert(lLeftPtr, 0);
+        Locator lLPTy = p.insert(lLeftPtr, 1);
+        Locator lRPTx = p.insert(lRightPtr, 0);
+        Locator lLPTx = p.insert(lRightPtr, 1);
+        x1 = fRand(0,MAX);
+        y1 = fRand(0,MAX);
+        x2 = fRand(0,MAX);
+        y2 = fRand(0,MAX);
+        p.insert(lLPTx, x1);
+        p.insert(lLPTy, y1);
+        p.insert(lRPTx, x2);
+        p.insert(lRPTx, y2);
+    }
 
     /****************************************************/
+    clock_t end=clock();
+    cout << "Time elapsed: " << double(diffclock(end,begin)) << " ms"<< endl;
 
-    p.printStats();
     closeConnection();
 }
 int main(int argc, char* argv[])
