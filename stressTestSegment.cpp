@@ -265,12 +265,23 @@ void write_to_blob(int number)
     iBlobStore * store = new iBlobOracleStore(mylob, errhp, svchp);
     iBlob p (store, false);
 
+    /* IBLOB FUNCTIONS USED TO CREATE THE SEGMENT OBJECT */
+    Locator l = locateGlobal(p);
+
+
+
+
+
+
+
+    /****************************************************/
+
     p.printStats();
     closeConnection();
 }
 int main(int argc, char* argv[])
 {
-    //write_to_blob(COUNT);
-    write_to_blob_TSS(COUNT);
+    write_to_blob(COUNT);
+    //write_to_blob_TSS(COUNT);
     return 1;
 }
