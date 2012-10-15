@@ -8,7 +8,7 @@
 using namespace std;
 
 
-#define COUNT 2000
+#define COUNT 20
 #define MAX 100
 
 static char *username = (char *) "aist";
@@ -202,7 +202,6 @@ void closeConnection(){
     checkerr(errhp, OCITransCommit(svchp, errhp, (ub4)0));
     if (envhp)
         (void) OCIHandleFree((dvoid *) envhp, OCI_HTYPE_ENV);
-
 }
 
 
@@ -265,8 +264,6 @@ void write_to_blob(int number)
     //iBlobStore * store = new iBlobOracleStore(mylob, errhp, svchp);
     iBlobStore * store = new iBlobOracleStore(mylob, errhp, svchp);
     iBlob p (store, false);
-
-
 
     p.printStats();
     closeConnection();
