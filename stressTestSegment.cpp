@@ -269,22 +269,40 @@ void write_to_blob(int number)
     /* IBLOB FUNCTIONS USED TO CREATE THE SEGMENT OBJECT */
     for(int i = 0; i < number; i++)
     {
+        cout<<i<<endl;
         Locator lGlobal = p.locateGlobal();
-        locateGlobal.insert(0, OBJECT_LEVEL);
-        Locator lLeftPt = p.locate(lGlobal,0);
-        Locator lRightPt = p.Locate(lGlobal, 1);
-        Locator lLPTx = p.insert(lLeftPtr, 0);
-        Locator lLPTy = p.insert(lLeftPtr, 1);
-        Locator lRPTx = p.insert(lRightPtr, 0);
-        Locator lLPTx = p.insert(lRightPtr, 1);
+        cout<<"Done 1 "<<endl;
+        Locator l;
+        if(lGlobal.getElements()  == 0)
+        {cout<<"Here"<<endl;
+            l = p.insert(lGlobal, 0);
+        }
+        cout<<"Done 2 "<<endl;
+        Locator lLeftPt = l.insert(0);
+        cout<<"Done 3 "<<endl;
+        Locator lRightPt = l.insert(1);
+        cout<<"Done 4 "<<endl;
+        Locator lLPTx = lLeftPt.insert(0);
+        cout<<"Done 5 "<<endl;
+        Locator lLPTy = lLeftPt.insert(1);
+        cout<<"Done 6 "<<endl;
+        Locator lRPTx = lRightPt.insert(0);
+        cout<<"Done 7 "<<endl;
+        Locator lRPTy = lRightPt.insert(1);
+        cout<<"Done 8 "<<endl;
         double x1 = fRand(0,MAX);
         double y1 = fRand(0,MAX);
         double x2 = fRand(0,MAX);
         double y2 = fRand(0,MAX);
-        p.insert(lLPTx, x1);
-        p.insert(lLPTy, y1);
-        p.insert(lRPTx, x2);
-        p.insert(lRPTx, y2);
+        cout<<"Done 8.5 "<<endl;
+        p.insertVal(x1, lLPTx, 0);
+        cout<<"Done 9 "<<endl;
+        p.insertVal(y1, lLPTy, 0);
+        cout<<"Done 10 "<<endl;
+        p.insertVal(x2, lRPTx, 0);
+        cout<<"Done 11 "<<endl;
+        p.insertVal(y2, lRPTy, 0);
+        cout<<"Done 12 "<<endl;
     }
 
     /****************************************************/
