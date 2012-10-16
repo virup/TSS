@@ -291,7 +291,7 @@ void write_to_blob(int number)
         Locator lRPTy = lRightPt.insert(1);
         cout<<"Done 8 "<<endl;
         double x1 = fRand(0,MAX);
-        cout<<x1<<endl;
+        cout<<"x1 = " <<x1<<endl;
         double y1 = fRand(0,MAX);
         double y1 = fRand(0,MAX);
         double x2 = fRand(0,MAX);
