@@ -295,7 +295,9 @@ void write_to_blob(int number)
         double x2 = fRand(0,MAX);
         double y2 = fRand(0,MAX);
         cout<<"Done 8.5 "<<endl;
-        p.insertVal(x1, lLPTx, 0);
+        Locator l;
+        l = p.insert(lLPTx, 0);
+        p.insertVal(x1, l, 0);
         cout<<"Done 9 "<<endl;
         p.insertVal(y1, lLPTy, 0);
         cout<<"Done 10 "<<endl;
