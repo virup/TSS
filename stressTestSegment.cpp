@@ -282,13 +282,13 @@ void write_to_blob(int number)
         cout<<"Done 3 "<<endl;
         Locator lRightPt = l.insert(1);
         cout<<"Done 4 "<<endl;
-        Locator lLPTx = p.insert(lLeftPt,0);
+        Locator lLPTx = lLeftPt.insert(0);
         cout<<"Done 5 "<<endl;
-        Locator lLPTy = p.insert(lLeftPt, 1);
+        Locator lLPTy = lLeftPt.insert(1);
         cout<<"Done 6 "<<endl;
-        Locator lRPTx = p.insert(lRightPt,0);
+        Locator lRPTx = lRightPt.insert(0);
         cout<<"Done 7 "<<endl;
-        Locator lRPTy = p.insert(lRightPt,1);
+        Locator lRPTy = lRightPt.insert(1);
         cout<<"Done 8 "<<endl;
         double x1 = fRand(0,MAX);
         double y1 = fRand(0,MAX);
