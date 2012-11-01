@@ -114,7 +114,6 @@ Path::Path(string strpath, TSSParser *tp, iBlob *iblob)
     this->consistent = false;
     if(!this->tp->storeAccessCode(strpath, this->vPath))
         cerr<<endl<<"FALSE";
-    //PopulateLocators();
 }
 
 // Update the locators in the vPath object
@@ -130,7 +129,6 @@ int Path::PopulateLocators()
             {
                 consistent = false;
                 throw 0;
-                return 0;
             }
             tempLocator = iblob->locate(tempLocator, (*it).accessCode);
             (*it).loc = tempLocator;
@@ -140,9 +138,9 @@ int Path::PopulateLocators()
     }
     catch(...)
     {
+        consistent = false;
         cerr<<"Cannot make the path consistent"<<endl;
         throw string("Cannot make the path consistent");
-        consistent = false;
         return 0;
     }
 }
@@ -159,10 +157,14 @@ int Path::count()
     {
         return -1;
     }
-    else
+    else if(this->isList())
     {
         Locator l = this->vPath[vPath.size() - 1].loc;
         return iblob->count(l);
+    }
+    else
+    {
+        cerr<<"!! Not a list!";
     }
 }
 
@@ -202,7 +204,6 @@ int Path::set(Path &path)
     for(it = path.vPath.begin(); it != path.vPath.end() ; it++)
         tempLoc = it->loc;
 
-    //cout<<vPath[vPath.size()-1].accessCode<<endl;
     try{
         l2 = iblob->insert(tempLoc, l2, vPath[vPath.size()-1].accessCode);
     }
@@ -245,10 +246,8 @@ Locator Path::gotoBO()
             cerr<<"Path::gotoBO - Discontinuity detected"<<endl;
             throw string("discontinuity");
         }
-       // cout<<it->accessCode<<".";
         it++;
     }while(it!= vPath.end()-1);
-    //cout<<endl;
 
     if(l.getElements() < (uint)it->accessCode)
         throw string("Not Present");

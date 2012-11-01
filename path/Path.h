@@ -98,7 +98,20 @@ public:
     int set(Path &path);
 
     friend class TSS;
+
+    void print()
+    {
+        cerr<<"...................."<<endl;
+        cerr<<this->strPath<<endl;
+        for(int i = 0; i < vPath.size(); i++)
+        {
+            cerr<<vPath[i].accessCode<<".";
+        }
+        cerr<<endl;
+    }
+
 };
+
 
 ////////////////////////////////////////////////////////////////////
 ////// Template functions has to be defined in the .h file /////////
@@ -114,6 +127,7 @@ int Path::set(T &val)
     }
     catch(...)
     {
+        cerr<<"ERROR IN gotoBO"<<endl;
         return 0;
     }
     PathComponent *p = &vPath[vPath.size()-1];
@@ -134,12 +148,13 @@ int Path::set(T *val, int size)
     }
     catch(string s)
     {
-        cout<<s<<endl;
+        cerr<<s<<endl;
         return 0;
     }
-    vPath[vPath.size()-1].loc  = iblob->insert(l,
-                                               vPath[vPath.size()-2].accessCode,
-                                               OBJECT_LEVEL);
+    //vPath[vPath.size()-1].loc  = iblob->insert(l,
+    //                                           vPath[vPath.size()-2].accessCode,
+    //                                           OBJECT_LEVEL);
+    vPath[vPath.size()-1].loc = l;
     for(int i = 0; i < size; i++)
     {
         iblob->insertVal(val[i], vPath[vPath.size()-1].loc, i);
@@ -155,7 +170,7 @@ uint Path::read(T &val)
 {
     if(this->isList())
         throw string("Error. This is a list");
-    cout<<endl;
+    cerr<<endl;
     if(!this->isConsistent())
         this->makeConsistent();
     if(this->isBO())
@@ -213,7 +228,7 @@ int Path::append(T *val, int size)
     }
     catch(string s)
     {
-        cout<<s<<endl;
+        cerr<<s<<endl;
         return 0;
     }
     int length = vPath[vPath.size() -1].loc.getElements();

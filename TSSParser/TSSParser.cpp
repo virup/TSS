@@ -135,7 +135,7 @@ bool TSSParser::isConnected(map<string, Node*> nodeMaps)
     for(it = nodeMaps.begin(); it != nodeMaps.end(); it++)
         if(it->second->parent() == NULL && it->second->isBO() != true)
         {
-            cout<< parentMissing++;
+            cerr<< parentMissing++;
             head = it->second;
         }
 
@@ -194,11 +194,11 @@ struct item{
 };
 void printlist(vector<string> l)
 {
-    cout<<"================="<<endl;
-    cout<<"Size = "<<l.size()<<endl;
+    cerr<<"================="<<endl;
+    cerr<<"Size = "<<l.size()<<endl;
     for(uint i = 0; i < l.size(); i++)
-        cout<<l[i]<<endl;
-    cout<<"================="<<endl;
+        cerr<<l[i]<<endl;
+    cerr<<"================="<<endl;
 
 }
 
@@ -208,10 +208,10 @@ void printmap(map<string, vector<item> > &tokenizedStatements)
     map<string, vector<item> >::iterator it = tokenizedStatements.begin();
     while(it!= tokenizedStatements.end())
     {
-        cout<<it->first<<endl;
+        cerr<<it->first<<endl;
         for(uint i = 0; i < it->second.size(); i++)
-            cout<<it->second[i].variableName<<":"<<it->second[i].typeName<<" ";
-        cout<<endl;
+            cerr<<it->second[i].variableName<<":"<<it->second[i].typeName<<" ";
+        cerr<<endl;
         it++;
     }
 }
@@ -513,10 +513,10 @@ bool TSSParser::validateGrammar()
 void printChildren(map<string, Node *> maplist)
 {
     map<string, Node *>:: iterator it;
-    cout<<"Children are: "<<endl;
+    cerr<<"Children are: "<<endl;
     for(it = maplist.begin(); it!= maplist.end(); it++)
     {
-        cout<<it->first<<endl;
+        cerr<<it->first<<endl;
 
     }
 
@@ -546,7 +546,7 @@ int checkAndReturnList(string &comp)
 bool TSSParser::storeAccessCode(string strpath, vector<PathComponent>& pathVector) 
 {
     bool returnVal = true;
-    PathComponent pathComp;
+    PathComponent *pathComp = new PathComponent;
     vector<string> strPathComp = tokenize(strpath, ".");
     //add the GLOBAL element
 
@@ -557,29 +557,33 @@ bool TSSParser::storeAccessCode(string strpath, vector<PathComponent>& pathVecto
         throw string("wrong path root");
     }
 
-    pathComp.label = current->name();
-    pathComp.accessCode = 0;
-    pathVector.push_back(pathComp);
+    pathComp->label = current->name();
+    pathComp->accessCode = 0;
+    pathVector.push_back(*pathComp);
 
     for(uint i = 1; i < strPathComp.size(); i++)
     {
         string component = strPathComp[i];
+
+        // Find array no. if present and also strip it out
         int arrayNo = checkAndReturnList(component);
+
         if(arrayNo != -1)
         {
-            PathComponent listPathComp;
-            listPathComp.label = "List";
-            listPathComp.accessCode = arrayNo;
+            PathComponent *listPathComp = new PathComponent;
+            listPathComp->label = "List";
+            listPathComp->accessCode = arrayNo;
 
-            // strip the substript
-            pathComp.label = component;
-            pathVector.push_back(pathComp);
-            // put the listPathComp in the vector too
-            pathVector.push_back(listPathComp);
+            PathComponent *pathComp = new PathComponent;
+            pathComp->label = component;
+
             if (current->children.find(component) != current->children.end())
             {
                 current = current->children[component];
-                pathVector[i].accessCode = current->pos();
+                //pathVector[i].accessCode = current->pos();
+                pathComp->accessCode = current->pos();
+                pathVector.push_back(*pathComp);
+                pathVector.push_back(*listPathComp);
             }
             else
             {
@@ -590,12 +594,14 @@ bool TSSParser::storeAccessCode(string strpath, vector<PathComponent>& pathVecto
         }
         else
         {
-            pathComp.label = component;
-            pathVector.push_back(pathComp);
+            PathComponent *pathComp = new PathComponent;
+            pathComp->label = component;
             if (current->children.find(component) != current->children.end())
             {
                 current = current->children[component];
-                pathVector[i].accessCode = current->pos();
+                //pathVector[i].accessCode = current->pos();
+                pathComp->accessCode = current->pos();
+                pathVector.push_back(*pathComp);
             }
             else
             {
