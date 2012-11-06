@@ -1,11 +1,12 @@
-#ifndef OBJLOCORACLE_H
-#define OBJLOCORACLE_HH
+#ifndef STU_OBJLOCORACLE_H
+#define STU_OBJLOCORACLE_H
 
 #include "ObjLoc.h"
 #include "iBlob.h"
 #include "iBlobOracleStore.h"
 
-
+namespace stu
+{
 class ObjLocOracle:public ObjLoc
 {
     private:
@@ -15,11 +16,12 @@ class ObjLocOracle:public ObjLoc
 
 
     public:
+        /* Oracle OCI specific constructor */
         ObjLocOracle(OCILobLocator *,
                 OCIError *,
                 OCISvcCtx *);
         int bind(UDT &);
 };
-
+}
 
 #endif

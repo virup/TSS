@@ -1,6 +1,8 @@
 #include "Path.h"
 
+using namespace stu;
 
+// The strPath should contain the rest of the path (in string representation)
 Path& Path::operator+(string strPath)
 {
     string newStrPath;
@@ -17,6 +19,7 @@ Path& Path::operator+(string strPath)
 }
 
 
+
 Path& Path::operator=(const Path &path)
 {
     this->vPath.clear();
@@ -31,15 +34,21 @@ Path& Path::operator=(const Path &path)
     return *this;
 }
 
+
+
 bool Path::makeConsistent()
 {
     this->PopulateLocators();
     return true;
 }
 
+
+
+
 void Path::UpdatePaths(string nStrPath)
 {
 }
+
 
 
 bool Path::isBO()
@@ -47,25 +56,35 @@ bool Path::isBO()
     return tp->isBO(this);
 }
 
+
+
 bool Path::isSO()
 {
     return tp->isSO(this);
 }
+
+
 
 bool Path::isList()
 {
     return tp->isList(this);
 }
 
+
+
 bool Path::isRO()
 {
     return tp->isRO(this);
 }
 
+
+
 Type Path::getBOType()
 {
     return tp->getBOType(this);
 }
+
+
 
 string Path::pointingType()
 {
@@ -74,6 +93,8 @@ string Path::pointingType()
     else
         throw string("Not a RO path");
 }
+
+
 
 vector<int> Path::getAccessCode()
 {
@@ -86,10 +107,14 @@ vector<int> Path::getAccessCode()
     return accessCodeList;
 }
 
+
+
 bool Path::isConsistent()
 {
     return this->consistent;
 }
+
+
 
 void  Path::makeInconsistent()
 {
@@ -97,7 +122,7 @@ void  Path::makeInconsistent()
 }
 
 
-//Default Constructor
+
 Path::Path()
 {
     this->consistent = false;
@@ -116,7 +141,7 @@ Path::Path(string strpath, TSSParser *tp, iBlob *iblob)
         cerr<<endl<<"FALSE";
 }
 
-// Update the locators in the vPath object
+//  Traverse the path in the iBlob and reach the end of the path
 int Path::PopulateLocators()
 {
     try{
@@ -173,6 +198,8 @@ string Path::getType()
     return this->tp->getType(this);
 }
 
+
+
 int Path::set(Path &path)
 {
     Locator l2;
@@ -215,6 +242,8 @@ int Path::set(Path &path)
     return 1 ;
 }
 
+
+
 Locator Path::gotoBO()
 {
     makeInconsistent();
@@ -227,6 +256,7 @@ Locator Path::gotoBO()
     {
         cerr<<endl<<"ERROR locating Global"<<endl;
     }
+
     vector<PathComponent>::iterator it = vPath.begin();
     do
     {
@@ -253,6 +283,8 @@ Locator Path::gotoBO()
         throw string("Not Present");
     return l;
 }
+
+
 
 bool Path::removeObj()
 {

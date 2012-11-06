@@ -1,8 +1,9 @@
-#ifndef OBJLOCORACLE_CPP
-#define OBJLOCORACLE_CPP
+#ifndef STU_OBJLOCORACLE_CPP
+#define STU_OBJLOCORACLE_CPP
 
 #include "ObjLocOracle.h"
 
+using namespace stu;
 ObjLocOracle::ObjLocOracle(OCILobLocator *l,
                            OCIError *e,
                            OCISvcCtx *s)
@@ -12,6 +13,9 @@ ObjLocOracle::ObjLocOracle(OCILobLocator *l,
     this->svchp = s;
 }
 
+/* Bind() : 1. Creates an iBLob object
+ *          2. Linkes the iBlob to the UDT
+ */
 int ObjLocOracle::bind(UDT &object)
 {
     iBlobStore *store = new iBlobOracleStore(this->lob,

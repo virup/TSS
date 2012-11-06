@@ -1,5 +1,5 @@
-#ifndef TSS_H
-#define TSS_H
+#ifndef STU_TSS_H
+#define STU_TSS_H
 
 #include <iostream>
 #include "constants.h"
@@ -16,34 +16,32 @@ Provides a semantic way for access components
 */
 
 using namespace std;
-
+namespace stu{
 class TSS
 {
     public:
         // constructor with tss file as input, isFile checks wether tssfile is a file or a string
         TSS(); // default constructor
+
+
+        /* if isFile = true, then char *tssfile is the name of the file
+         * else, it is the actual grammar */
         TSS(const char* tssfile,bool isFile=true);
         TSS(string tssfile,bool isFile=true);
         ~TSS();// destructor
 
 
-        /* Initializaiton Functions : LEGACY FUNCTIONS PHASE THESE OUT*/
-        void setTypeSpec(const char* tssfile, bool isFile = true);// associate type specification
-        void setStoreHandle(void* b, bool ismem = false);// associate blob handler
-
-        /* Create Path */
+        /* Create Path objects using these functions only */
         Path createPath(void *) const;
         Path createPath(string strPath, void *) const ;
 
-        /* Insert Functions */
-
+        /*Path constructors used internally*/
         friend Path::Path(const Path&);
         friend Path::Path(string strPath, TSSParser *tssp, iBlob *);
 
     private:
-        TSSParser *tp;
-        string type;
+        TSSParser *tp_;
 };
-
+}
 
 #endif
