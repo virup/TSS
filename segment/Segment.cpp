@@ -7,12 +7,12 @@ class Segment::SegmentImpl
 {
     private:
         const std::string grammarFile;
-        const TSS t;
 
     public:
+        const TSS t;
         SegmentImpl():grammarFile("segment/Segment.tss"), t(grammarFile, true){}
-        int insertValue(double x1, double y1, double x2, double y2, iBlob *);
-        void print(iBlob *);
+//        int insertValue(double x1, double y1, double x2, double y2, iBlob *);
+//        void print(iBlob *);
 };
 
 Segment::Segment():segment(new SegmentImpl)
@@ -25,25 +25,26 @@ Segment::~Segment()
 }
 
 
-int Segment::insertValue(double x1, double y1, double x2, double y2)
+//int Segment::insertValue(double x1, double y1, double x2, double y2)
+//{
+//    return segment->insertValue(x1,y1, x2,y2, getStore());
+//}
+
+//void Segment::print()
+//{
+//    if(!isStorageAllocated())
+//        return ;
+//   segment->print(getStore());
+//}
+
+int Segment::insertValue(double x1, double y1,
+                  double x2, double y2)
 {
     if(!isStorageAllocated())
         return 0;
-    return segment->insertValue(x1,y1, x2,y2, getStore());
-}
 
-void Segment::print()
-{
-    if(!isStorageAllocated())
-        return ;
-   segment->print(getStore());
-}
-
-int Segment::SegmentImpl::insertValue(double x1, double y1,
-                  double x2, double y2, iBlob *store)
-{
-    Path pLpt = t.createPath("Segment.lPt", store);
-    Path pRpt = t.createPath("Segment.rPt", store);
+    Path pLpt = segment->t.createPath("Segment.lPt", store);
+    Path pRpt = segment->t.createPath("Segment.rPt", store);
 
     Path pLptLat = pLpt + "lat";
     pLptLat.set(x1);
@@ -60,13 +61,16 @@ int Segment::SegmentImpl::insertValue(double x1, double y1,
     return 1;
 }
 
-void Segment::SegmentImpl::print(iBlob *store)
+void Segment::print()
 {
+
+    if(!isStorageAllocated())
+        return ;
 
     double x1, y1, x2, y2;
 
-    Path pLpt = t.createPath("Segment.lPt", store);
-    Path pRpt = t.createPath("Segment.rPt", store);
+    Path pLpt = segment->t.createPath("Segment.lPt", store);
+    Path pRpt = segment->t.createPath("Segment.rPt", store);
 
     Path pLptLat = pLpt + "lat";
     pLptLat.read(x1);
